@@ -1,0 +1,1145 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Client Risk Signals</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: CRM shell — top bar + nav, single working column, right-hand signal drawer */
+:root{
+  --bg:#f8fafc; --surface:#ffffff; --surface-2:rgba(241,245,249,.8); --line:rgba(15,23,42,.08); --line-strong:rgba(15,23,42,.18);
+  --fg:#1e293b; --fg-2:#475569; --fg-3:#64748b;
+  --accent:#6366f1; --accent-soft:rgba(99,102,241,.1); --accent-fg:#ffffff; --accent-ink:#4f46e5;
+  --sev-severe:#dc2626; --sev-severe-bg:#fee2e2;
+  --sev-high:#c2410c; --sev-high-bg:#ffedd5;
+  --sev-medium:#b45309; --sev-medium-bg:#fef3c7;
+  --sev-trend:#4f46e5; --sev-trend-bg:#e0e7ff;
+  --sev-pos:#059669; --sev-pos-bg:#d1fae5;
+  --band:rgba(99,102,241,.14); --ours:#94a3b8;
+  --anno-bg:#fff7d6; --anno-fg:#5c4a00; --anno-line:#e5cf6b;
+  --glass:rgba(255,255,255,.62); --glass-line:rgba(255,255,255,.75);
+  --shadow:0 12px 40px rgba(15,23,42,.14);
+  --font-ui:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-data:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.45}
+button,select,textarea,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num,.mono{font-family:var(--font-data);font-variant-numeric:tabular-nums;font-size:.92em}
+h1,h2,h3{text-wrap:balance;margin:0}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1280px;margin:0 auto}
+
+/* top bar */
+.spacer{flex:1}
+select{background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:5px 8px}
+.btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:6px;padding:6px 12px;font-weight:500}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.btn.ghost{border-color:transparent;background:none;color:var(--accent);padding-inline:6px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.sm{padding:3px 9px;font-size:13px}
+.toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--fg-2)}
+
+main{padding-block:20px 60px}
+.crumbs{font-size:13px;color:var(--fg-3);margin-bottom:8px}
+.crumbs button{background:none;border:0;padding:0;color:var(--accent)}
+.pagehead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 24px;margin-bottom:16px}
+.pagehead h1{font-size:24px;letter-spacing:-.015em}
+.pagehead .sub{color:var(--fg-2);font-size:13px;display:flex;gap:6px 16px;flex-wrap:wrap}
+.section{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:16px}
+.section > header{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.section > header h2{font-size:15px}
+.section .body{padding:14px 16px}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--fg-3);font-weight:600}
+
+/* pills and chips */
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;letter-spacing:.02em}
+.pill .d{width:7px;height:7px;border-radius:50%;background:currentColor}
+.lvl-severe{color:var(--sev-severe);background:var(--sev-severe-bg)}
+.rating{font-size:12px;font-weight:600;padding:2px 9px;border-radius:4px;border:1px solid var(--line-strong);color:var(--fg-2)}
+.rating.r-AtRisk{border-color:var(--sev-high);color:var(--sev-high)}
+.rating.r-Critical{border-color:var(--sev-severe);color:var(--sev-severe)}
+.rating.r-Healthy{border-color:var(--sev-pos);color:var(--sev-pos)}
+.gap{font-size:12px;font-weight:600;color:var(--anno-fg);background:var(--anno-bg);border:1px solid var(--anno-line);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.status{font-size:12px;color:var(--fg-2);white-space:nowrap}
+.status.New{color:var(--accent);font-weight:600}
+.src{font-size:12px;color:var(--fg-3);white-space:nowrap}
+
+/* service strip */
+
+/* signal rows */
+.sig{display:grid;grid-template-columns:172px minmax(0,1fr) auto;gap:4px 14px;padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left}
+.sig:hover{background:var(--surface-2)}
+.sig:last-child{border-bottom:0}
+.sig .what{min-width:0}
+.sig .what .t{font-weight:600}
+.sig .what .c{font-size:12px;color:var(--fg-3)}
+.sig .q{grid-column:2/4;font-size:13px;color:var(--fg-2);border-left:2px solid var(--line-strong);padding-left:10px;font-style:italic;min-width:0}
+.sig .meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.sig.muted{opacity:.6}
+.empty{padding:24px 16px;color:var(--fg-3);text-align:center}
+
+/* tables */
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-3);text-align:left;font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr.click{cursor:pointer}
+tbody tr.click:hover{background:var(--surface-2)}
+td.r,th.r{text-align:right}
+.acct{font-weight:600}
+.acct small{display:block;font-weight:400;color:var(--fg-3);font-size:12px}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-align:left}
+.tile .v{font-size:24px;font-weight:600;letter-spacing:-.01em;font-family:var(--font-data)}
+.tile .l{font-size:12px;color:var(--fg-3)}
+button.tile:hover{border-color:var(--line-strong)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+
+/* brief */
+.brief{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0}
+.brief > div{padding:14px 16px;border-right:1px solid var(--line);min-width:0}
+.brief > div:last-child{border-right:0}
+.brief ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.brief li button{background:none;border:0;padding:0;text-align:left;color:var(--fg);display:flex;gap:8px;align-items:baseline}
+.brief li button:hover .n{text-decoration:underline}
+.brief .big{font-size:22px;font-weight:600;font-family:var(--font-data)}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,15,13,.35);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);background:var(--surface);z-index:41;box-shadow:var(--shadow);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.drawer header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+.drawer header h2{font-size:18px;margin-top:4px}
+.drawer .x{margin-left:auto;background:none;border:1px solid var(--line);border-radius:6px;width:32px;height:32px;flex:none}
+.drawer .scroll{overflow-y:auto;flex:1;padding:16px 18px;display:flex;flex-direction:column;gap:18px}
+.drawer .foot{border-top:1px solid var(--line);padding:12px 18px;display:flex;flex-direction:column;gap:10px}
+.kv{display:grid;grid-template-columns:130px minmax(0,1fr);gap:6px 12px;font-size:13px}
+.kv dt{color:var(--fg-3)} .kv dd{margin:0}
+blockquote{margin:0;padding:12px 14px;background:var(--surface-2);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;font-size:14px}
+blockquote footer{font-size:12px;color:var(--fg-3);margin-top:6px;font-style:normal}
+.hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.hist li{display:grid;grid-template-columns:88px minmax(0,1fr);gap:10px}
+.hist .when{color:var(--fg-3);font-family:var(--font-data);font-size:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.actmenu{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.actmenu button{text-align:left;border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:10px 12px}
+.actmenu button:hover{border-color:var(--accent)}
+.actmenu button b{display:block;font-size:13px}
+.actmenu button span{font-size:12px;color:var(--fg-3)}
+textarea{width:100%;min-height:72px;border:1px solid var(--line-strong);border-radius:6px;padding:8px;background:var(--surface)}
+.hint{font-size:12px;color:var(--fg-3)}
+
+/* annotations */
+.anno{display:block;background:var(--anno-bg);color:var(--anno-fg);border:1px solid var(--anno-line);border-radius:6px;padding:6px 10px;font-size:12px;line-height:1.4}
+.anno b{font-weight:700}
+
+/* popover legend */
+.legend{font-size:13px;display:flex;flex-direction:column;gap:6px;padding:12px 16px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.legend ul{margin:0;padding-left:18px}
+
+/* chart */
+
+/* client record */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media (max-width:960px){.cols{grid-template-columns:minmax(0,1fr)}}
+.idcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:16px}
+.idcard .top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-start}
+.idcard h1{font-size:24px;letter-spacing:-.015em}
+.idcard .sub{color:var(--fg-2);font-size:13px;display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.facts{display:flex;flex-wrap:wrap;gap:10px 32px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.fact .l{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-3);font-weight:600}
+.fact .v{font-size:14px;font-weight:600}
+.pagetabs{display:flex;gap:2px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:16px}
+.pagetabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 12px 9px;color:var(--fg-2);font-weight:500;display:flex;gap:6px;align-items:center}
+.pagetabs button[aria-selected="true"]{border-bottom-color:var(--accent);color:var(--fg)}
+.pagetabs .ct{font-family:var(--font-data);font-size:11px;background:var(--surface-2);border-radius:999px;padding:0 6px;color:var(--fg-2)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;border:1px solid var(--line-strong);color:var(--fg-2);white-space:nowrap}
+.tag.st-active,.tag.ok{border-color:var(--sev-pos);color:var(--sev-pos)}
+.tag.st-expired,.tag.bad{border-color:var(--sev-severe);color:var(--sev-severe)}
+.tag.st-suspended,.tag.warn{border-color:var(--sev-medium);color:var(--sev-medium)}
+.attn{list-style:none;margin:0;padding:0}
+.attn li{display:flex;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line)}
+.attn li:last-child{border-bottom:0}
+.attn .tx{flex:1;min-width:0}
+.list{list-style:none;margin:0;padding:0}
+.list li{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;justify-content:space-between;align-items:baseline}
+.list li:last-child{border-bottom:0}
+.list .sub2{font-size:12px;color:var(--fg-3)}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.tl li:last-child{border-bottom:0}
+.tl .when{font-family:var(--font-data);font-size:12px;color:var(--fg-3)}
+.tl .meta{font-size:12px;color:var(--fg-3);margin-top:2px}
+.sigmini{display:grid;grid-template-columns:172px minmax(0,1fr) auto;gap:10px;align-items:baseline;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 16px}
+.sigmini:hover{background:var(--surface-2)}
+.sigmini:last-child{border-bottom:0}
+.contract-head{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:baseline;padding:12px 16px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px}
+.modal .bg{position:absolute;inset:0;background:rgba(10,15,13,.45)}
+.modal .panel{position:relative;background:var(--surface);border-radius:12px;width:min(580px,100%);max-height:calc(100vh - 32px);overflow:auto;box-shadow:var(--shadow)}
+.modal .panel > header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.modal .panel > header h2{font-size:17px}
+.modal .fields{padding:16px 18px;display:grid;gap:12px}
+.modal .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal label.f{display:grid;gap:4px;font-size:12px;color:var(--fg-3);font-weight:600}
+.modal input[type=text],.modal input[type=date],.modal select{width:100%;background:var(--surface);border:1px solid var(--line-strong);border-radius:6px;padding:7px 9px}
+.modal .pfoot{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.modal .opts{display:flex;gap:16px;flex-wrap:wrap}
+@media (max-width:640px){.modal .two{grid-template-columns:1fr}.tl li{grid-template-columns:1fr}}
+
+/* toasts / notification panel */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;z-index:60;font-size:13px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+.pattern{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:16px}
+.pattern .big{font-family:var(--font-data);font-size:22px;font-weight:600;color:var(--sev-high)}
+.unattr{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,300px);gap:16px;padding:16px;border-bottom:1px solid var(--line)}
+.unattr:last-child{border-bottom:0}
+
+@media (max-width:640px){
+  .sig{grid-template-columns:minmax(0,1fr) auto}
+  .sig .sevcell{grid-column:1/3}
+  .sig .q{grid-column:1/3}
+  .unattr{grid-template-columns:minmax(0,1fr)}
+  .actmenu{grid-template-columns:1fr}
+  .brief > div{border-right:0;border-bottom:1px solid var(--line)}
+  .kv{grid-template-columns:110px minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:no-preference){
+  .drawer{animation:slide .18s ease-out}
+  @keyframes slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
+}
+
+/* ---- Hub-style skin: soft gradient, frosted cards, pill controls (visual reference: Hub-V1) ---- */
+body{background-color:#f8fafc;background-image:radial-gradient(circle at 15% 10%,#e0e7ff 0%,transparent 40%),radial-gradient(circle at 85% 30%,#f3e8ff 0%,transparent 45%),radial-gradient(circle at 50% 90%,#fae8ff 0%,transparent 50%);background-attachment:fixed;min-height:100vh;font-size:13px}
+.num{font-family:var(--font-ui);font-size:1em;font-variant-numeric:tabular-nums}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.9em}
+select{border-radius:12px;background:#fff;border:1px solid var(--line)}
+main{padding-block:28px 72px}
+.section,.idcard,.tile,.pattern{background:var(--glass);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border:1px solid var(--glass-line);border-radius:24px;box-shadow:0 8px 32px rgba(0,0,0,.04),0 2px 12px rgba(0,0,0,.02)}
+.section{overflow:hidden;margin-bottom:20px}
+.section > header{border-bottom:0;padding:20px 24px 10px}
+.section > header h2{font-size:17px;font-weight:700;letter-spacing:-.01em}
+.idcard{padding:24px 28px;margin-bottom:20px}
+.idcard h1{font-size:26px;font-weight:700}
+.facts{border-top:1px solid var(--line);margin-top:18px;padding-top:16px}
+.fact .v{font-size:18px;font-weight:700}
+.fact .l,.eyebrow{font-weight:700;letter-spacing:.5px}
+.contract-head{background:rgba(99,102,241,.06);border-bottom:0;padding:14px 24px}
+/* segmented pill tabs */
+.pagetabs{display:inline-flex;flex-wrap:wrap;gap:2px;padding:4px;margin:0 0 20px;background:rgba(255,255,255,.6);border:1px solid var(--glass-line);border-radius:999px}
+.pagetabs button{border:0;border-radius:999px;padding:8px 16px;color:var(--fg-3);font-weight:600;background:none}
+.pagetabs button[aria-selected="true"]{background:var(--accent);color:#fff;border:0}
+.pagetabs button[aria-selected="true"] .ct{background:rgba(255,255,255,.25);color:#fff}
+.pagetabs .ct{background:rgba(99,102,241,.12);color:var(--accent-ink)}
+.chip{border-radius:999px}
+/* buttons */
+.btn{border-radius:12px;border:1px solid var(--line-strong);background:#fff;font-weight:600;padding:8px 16px}
+.btn.sm{padding:4px 12px;border-radius:10px}
+.btn:hover{background:#f1f5f9}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#4f46e5}
+.btn.ghost{background:none;border-color:transparent;color:var(--accent-ink)}
+.btn.ghost:hover{background:var(--accent-soft)}
+/* tables */
+th{font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--fg-3);padding:12px 16px;border-bottom:1px solid var(--line)}
+td{padding:14px 16px;font-size:13.5px;font-weight:500;border-bottom:1px solid rgba(15,23,42,.05)}
+tbody tr:hover td{background:rgba(255,255,255,.55)}
+/* pills, tags, badges as soft tinted pills */
+.pill{padding:3px 12px;font-size:11px}
+.tag{border-radius:999px;font-size:11px;padding:3px 12px;border:1px solid transparent;background:#f1f5f9;color:#64748b}
+.tag.st-active,.tag.ok{background:var(--sev-pos-bg);color:var(--sev-pos);border-color:#a7f3d0}
+.tag.st-expired,.tag.bad{background:var(--sev-severe-bg);color:var(--sev-severe);border-color:#fecaca}
+.tag.st-suspended,.tag.warn{background:var(--sev-medium-bg);color:var(--sev-medium);border-color:#fde68a}
+.rating{border-radius:999px;font-size:11px;padding:3px 12px;border:1px solid transparent;background:#f1f5f9}
+.rating.r-Healthy{background:var(--sev-pos-bg);border-color:#a7f3d0;color:var(--sev-pos)}
+.rating.r-AtRisk{background:var(--sev-high-bg);border-color:#fed7aa;color:var(--sev-high)}
+.rating.r-Critical{background:var(--sev-severe-bg);border-color:#fecaca;color:var(--sev-severe)}
+.gap{border-radius:999px}
+/* rows */
+.sig,.sigmini{padding-left:24px;padding-right:24px}
+.sig:hover,.sigmini:hover{background:rgba(255,255,255,.6)}
+.sig .q{border-left-color:rgba(99,102,241,.35)}
+.attn li,.list li,.tl li,.empty{padding-left:24px;padding-right:24px}
+.legend{background:rgba(99,102,241,.05);padding-left:24px;padding-right:24px}
+.tile{padding:18px 22px}.tile .v{font-size:28px;font-weight:700}
+.anno{border-radius:12px}
+.toast{border-radius:14px;background:#1e293b;color:#fff}
+/* dummy-data blur: sections outside the risk signals scope */
+.dm{position:relative;margin-bottom:20px}
+.dm > .dm-body{filter:blur(6px);opacity:.7;pointer-events:none;user-select:none}
+.dm > .dm-body > .section,.dm > .dm-body > .tiles,.dm > .dm-body > .cols{margin-bottom:0}
+.dm-tag{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;background:#fff;border:1px dashed var(--line-strong);border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.4px;padding:5px 14px;color:var(--fg-3);white-space:nowrap}
+.dm.top > .dm-tag{top:90px}
+.dm.fact{display:block;margin:0}
+.dm.fact > .dm-body{filter:blur(5px)}
+.dm.fact > .dm-tag{display:none}
+.pagetabs button:disabled{opacity:.4;cursor:not-allowed}
+.scopebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:rgba(99,102,241,.08);border:1px dashed rgba(99,102,241,.35);border-radius:16px;padding:10px 16px;margin-bottom:16px;font-size:12.5px;color:var(--fg-2)}
+.scopebar b{color:var(--accent-ink)}
+tr.grp td{background:rgba(99,102,241,.07);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--accent-ink);padding:8px 24px}
+tbody tr.grp:hover td{background:rgba(99,102,241,.07)}
+.cat-tbl{min-width:900px}.cat-tbl td{vertical-align:top}
+.section + .anno{margin:-6px 0 20px}
+details.ref > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:18px 24px;font-size:15px;font-weight:700}
+details.ref > summary::-webkit-details-marker{display:none}
+details.ref > summary::after{content:"▸";margin-left:auto;color:var(--fg-3)}
+details.ref[open] > summary::after{content:"▾"}
+details.ref[open] > summary{border-bottom:1px solid var(--line)}
+.hc{padding:0}
+.hc-top{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:24px 24px 18px}
+.hc-rate{display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap}
+.rating.lg{font-size:15px;padding:6px 18px}
+.hc-alert{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin:0 24px 20px;background:var(--anno-bg);border:1px solid var(--anno-line);border-radius:14px;padding:10px 16px;font-size:13px;color:var(--anno-fg)}
+.hc-svc{border-top:1px solid var(--line)}
+.hrow{display:grid;grid-template-columns:minmax(0,1fr) 110px 110px 110px 92px;gap:12px;align-items:center;padding:12px 24px;border-top:1px solid rgba(15,23,42,.05)}
+.hrow:first-child{border-top:0}
+.hrow.head{padding-block:10px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--fg-3);background:rgba(99,102,241,.04)}
+.hname{display:flex;flex-direction:column;min-width:0}
+.hact{display:flex;justify-content:flex-end}
+.hc-foot{padding:12px 24px 18px;border-top:1px solid rgba(15,23,42,.05)}
+.hc-hist{border-top:1px solid var(--line)}
+.hc-hist > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 24px;font-weight:700;font-size:13px}
+.hc-hist > summary::-webkit-details-marker{display:none}
+.hc-hist > summary::after{content:"▸";margin-left:auto;color:var(--fg-3)}
+.hc-hist[open] > summary::after{content:"▾"}
+.hc-hist .tl li:first-child{border-top:1px solid rgba(15,23,42,.05)}
+@media (max-width:640px){.hrow{grid-template-columns:minmax(0,1fr) auto}.hrow > :nth-child(3),.hrow > :nth-child(4){display:none}}
+.cattag{display:inline-block;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);border:1px solid rgba(99,102,241,.25);white-space:nowrap}
+/* category colours: tinted pill + darker text; the label always carries the meaning */
+.cattag[data-c="exit-intent"]{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+.cattag[data-c="contract-expiry"]{background:#fef3c7;color:#92400e;border-color:#fde68a}
+.cattag[data-c="spend-cut"]{background:#ffedd5;color:#c2410c;border-color:#fed7aa}
+.cattag[data-c="competitor"]{background:#f3e8ff;color:#7e22ce;border-color:#e9d5ff}
+.cattag[data-c="dissatisfaction"]{background:#fce7f3;color:#be185d;border-color:#fbcfe8}
+.cattag[data-c="delivery-delay"]{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe}
+.cattag[data-c="stakeholder-change"]{background:#ccfbf1;color:#0f766e;border-color:#99f6e4}
+.cattag[data-c="engagement-drop"]{background:#e2e8f0;color:#334155;border-color:#cbd5e1}
+/* email sentiment heat map */
+.sent-body{padding:4px 24px 20px;display:grid;gap:14px}
+.sent-sum{margin:0;font-size:14.5px;font-weight:500;line-height:1.5}
+.stone{display:inline-block;font-size:12px;font-weight:700;padding:3px 12px;border-radius:999px;border:1px solid transparent}
+.stone.positive{background:#d1fae5;color:#047857;border-color:#a7f3d0}
+.stone.neutral{background:#f1f5f9;color:#475569;border-color:#cbd5e1}
+.stone.negative{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+.hm-wrap{display:grid;gap:6px}
+.hmgrid{display:grid;gap:4px}
+.hmmon{font-size:11px;font-weight:700;color:var(--fg-3);border-left:1px solid #cbd5e1;padding-left:5px;white-space:nowrap;overflow:hidden}
+.hmlabels{margin-bottom:-2px}
+.hm{position:relative;width:100%;height:34px;border-radius:8px;border:1px solid transparent;padding:0;font-size:11px;font-weight:700;color:#1e293b}
+.hm.m{height:40px}
+.hm.positive,.sw.positive{background:#6ee7b7}
+.hm.neutral,.sw.neutral{background:#cbd5e1}
+.hm.negative,.sw.negative{background:#f87171}
+.hm.low,.sw.low{background:#fff;border:1px dashed #94a3b8}
+.hm.before,.sw.before{background:repeating-linear-gradient(45deg,#f1f5f9,#f1f5f9 4px,#e2e8f0 4px,#e2e8f0 8px);border-color:#e2e8f0}
+.hm[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:2px}
+.hm:hover{filter:brightness(.95)}
+.hmtable{display:grid;grid-template-columns:118px minmax(0,1fr);gap:6px 12px;align-items:center}
+.hmrowlab{font-size:13px;font-weight:700;color:var(--fg)}
+.hmrowlab small{display:block;font-size:11px;font-weight:500;color:var(--fg-3)}
+.hm.r-none,.sw.r-none{background:#fff;border:1px dashed #94a3b8}
+.hm.r-val{color:#1e293b}
+.hm.r-noreply,.sw.r-noreply{background:#334155;color:#fff;font-size:12px}
+.stone.r-noreply{background:#334155;color:#fff;border-color:#334155}
+.stone.r-speed{color:#1e293b;border-color:rgba(15,23,42,.14)}
+.gradlg{display:inline-flex;align-items:center;gap:6px;font-size:12px}
+.gradbar{display:inline-block;width:120px;height:12px;border-radius:6px;border:1px solid rgba(15,23,42,.1)}
+.hm.r-before{background:repeating-linear-gradient(45deg,#f1f5f9,#f1f5f9 4px,#e2e8f0 4px,#e2e8f0 8px);border-color:#e2e8f0}
+.lgnote{font-size:11px;color:var(--fg-3);font-style:italic}
+.hmlg{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-right:22px}
+.hmlegend{display:flex;flex-wrap:wrap;gap:8px 8px;font-size:12px;color:var(--fg-2);margin-top:6px}
+.hmlegend span{display:inline-flex;align-items:center}
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:6px;border:1px solid transparent}
+.sentpanel{border:1px solid var(--line);border-radius:16px;padding:16px 18px;background:rgba(255,255,255,.7);display:grid;gap:10px;align-content:start;min-width:0}
+.evlist{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.evlist li{border-left:3px solid var(--line-strong);padding-left:12px}
+.evlist li.negative{border-left-color:#f87171}.evlist li.positive{border-left-color:#34d399}
+.evq{margin:0;padding:0;background:none;border:0;font-size:14px;font-style:italic;border-radius:0}
+.evlist .meta{font-size:12px;color:var(--fg-3);margin-top:2px}
+@media (max-width:640px){.sent-body{padding-inline:16px}}
+/* overlays stay fully opaque (Hub rule) */
+.drawer,.modal .panel{background:#fff;backdrop-filter:none}
+.drawer{border-radius:24px 0 0 24px}
+.modal .panel{border-radius:24px}
+.drawer header,.modal .panel > header{border-bottom:1px solid var(--line)}
+blockquote{background:rgba(99,102,241,.06);border-left-color:var(--accent);border-radius:0 12px 12px 0}
+.actmenu button{border-radius:14px}
+.actmenu button:hover{border-color:var(--accent);background:var(--accent-soft)}
+textarea,.modal input[type=text],.modal input[type=date],.modal select{border-radius:12px;background:#fff}
+th:first-child,td:first-child{padding-left:24px}th:last-child,td:last-child{padding-right:24px}
+.svc-tbl{table-layout:fixed;min-width:860px}
+.svc-tbl th:nth-child(1){width:17%}.svc-tbl th:nth-child(2){width:11%}.svc-tbl th:nth-child(3){width:14%}.svc-tbl th:nth-child(4){width:11%}.svc-tbl th:nth-child(5){width:11%}.svc-tbl th:nth-child(6){width:9%}.svc-tbl th:nth-child(7){width:16%}.svc-tbl th:nth-child(8){width:11%}
+.svc-tbl select{width:100%;padding:5px 6px}
+@media (max-width:640px){.section > header,.idcard{padding-left:16px;padding-right:16px}th,td{padding-left:14px;padding-right:14px}}
+</style>
+
+<main class="wrap" id="app"></main>
+<div id="overlay"></div>
+<div id="modalHost"></div>
+<div id="toastHost"></div>
+
+<script>
+/* ---------- helpers ---------- */
+const TODAY = new Date(2026, 9, 15);
+const D = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const pad = n => String(n).padStart(2, '0');
+const fmt = s => { const d = typeof s === 'string' ? D(s) : s; return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear(); };
+const fmtShort = s => { const d = typeof s === 'string' ? D(s) : s; return pad(d.getDate()) + '/' + pad(d.getMonth() + 1); };
+const iso = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const daysBetween = (a, b) => Math.round((b - a) / 864e5);
+const ago = s => { const n = daysBetween(D(s), TODAY); return n <= 0 ? 'Today' : n === 1 ? 'Yesterday' : n + ' days ago'; };
+const money = n => 'S$' + Math.round(n).toLocaleString('en-SG');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ---------- reference data (all fictional) ---------- */
+const SVC = {
+  seo: { name: 'SEO', line: 'SEO' }, gads: { name: 'Google Ads', line: 'Paid Media' },
+  psoc: { name: 'Paid Social', line: 'Paid Media' }, wdev: { name: 'Website Development', line: 'Web' },
+  wmnt: { name: 'Website Maintenance', line: 'Web' }
+};
+const ME = 'Jane Tan';
+
+const ORGS = [
+  { id: 'abc', name: 'ABC Pte Ltd', am: 'Jane Tan', rating: 'Healthy', ratedOn: '2026-09-12', pattern: 'cooling', baseH: 6, peakH: 60, coolFrom: 48,
+    services: [
+      { id: 'abc-seo', type: 'seo', pe: 'Hafiz Rahman', contract: 'CTR-2026-0118', end: '2027-03-31', value: 24000 },
+      { id: 'abc-gads', type: 'gads', pe: 'Siti Aminah', contract: 'CTR-2025-0412', end: '2027-01-31', value: 14400 },
+      { id: 'abc-wm', type: 'wmnt', pe: 'Kenneth Goh', contract: 'CTR-2025-0412', end: '2027-01-31', value: 2400 }],
+    notes: [{ date: '2025-12-25', label: 'Christmas' }, { date: '2026-08-09', label: 'National Day' }, { date: '2026-09-29', label: 'Reporting complaint' }] },
+  { id: 'xyz', name: 'XYZ Holdings Pte Ltd', am: 'Marcus Lim', rating: 'At Risk', ratedOn: '2026-10-02', pattern: 'cooling', baseH: 8, peakH: 70, coolFrom: 47,
+    services: [
+      { id: 'xyz-seo', type: 'seo', pe: 'Kenneth Goh', contract: 'CTR-2025-0907', end: '2026-12-31', value: 18000 },
+      { id: 'xyz-psoc', type: 'psoc', pe: 'Mei Ling Chua', contract: 'CTR-2025-0907', end: '2026-12-31', value: 9600 }],
+    notes: [{ date: '2026-08-09', label: 'National Day' }] },
+  { id: 'def', name: 'DEF Trading Pte Ltd', am: 'Jane Tan', rating: 'Healthy', ratedOn: '2026-08-28', pattern: 'cooling', baseH: 4, peakH: 43, coolFrom: 46,
+    services: [
+      { id: 'def-seo', type: 'seo', pe: 'Hafiz Rahman', contract: 'CTR-2026-0230', end: '2027-04-30', value: 21000 },
+      { id: 'def-gads', type: 'gads', pe: 'Siti Aminah', contract: 'CTR-2026-0230', end: '2027-04-30', value: 16800 }],
+    notes: [{ date: '2025-12-25', label: 'Christmas' }, { date: '2026-08-09', label: 'National Day' }] },
+  { id: 'hbl', name: 'Harbourline Logistics Pte Ltd', am: 'Priya Nair', rating: 'Healthy', ratedOn: '2026-10-01', pattern: 'stable', baseH: 5,
+    services: [
+      { id: 'hbl-gads', type: 'gads', pe: 'Siti Aminah', contract: 'CTR-2026-0311', end: '2027-06-30', value: 36000 },
+      { id: 'hbl-psoc', type: 'psoc', pe: 'Mei Ling Chua', contract: 'CTR-2026-0311', end: '2027-06-30', value: 18000 },
+      { id: 'hbl-wdev', type: 'wdev', pe: 'Kenneth Goh', contract: 'CTR-2026-0312', end: '2026-12-15', value: 12000 }],
+    notes: [] },
+  { id: 'kpl', name: 'Kopi Lane F&B Pte Ltd', am: 'Jane Tan', rating: 'Healthy', ratedOn: '2026-09-20', pattern: 'stable', baseH: 7,
+    services: [
+      { id: 'kpl-psoc', type: 'psoc', pe: 'Mei Ling Chua', contract: 'CTR-2025-1120', end: '2026-12-20', value: 8400 },
+      { id: 'kpl-wm', type: 'wmnt', pe: 'Kenneth Goh', contract: 'CTR-2025-1120', end: '2026-12-20', value: 1200 }],
+    notes: [] },
+  { id: 'mdg', name: 'Meridian Dental Group Pte Ltd', am: 'Priya Nair', rating: 'At Risk', ratedOn: '2026-09-25', pattern: 'recovering', baseH: 5, peakH: 30,
+    services: [
+      { id: 'mdg-seo', type: 'seo', pe: 'Hafiz Rahman', contract: 'CTR-2026-0040', end: '2027-02-28', value: 19200 },
+      { id: 'mdg-gads', type: 'gads', pe: 'Siti Aminah', contract: 'CTR-2026-0040', end: '2027-02-28', value: 14400 }],
+    notes: [{ date: '2026-05-04', label: 'Issue ISS-0981 opened' }, { date: '2026-07-20', label: 'Issue resolved' }] },
+  { id: 'npr', name: 'Northpoint Realty Pte Ltd', am: 'Marcus Lim', rating: 'Healthy', ratedOn: '2026-09-30', pattern: 'stable', baseH: 6,
+    services: [{ id: 'npr-gads', type: 'gads', pe: 'Siti Aminah', contract: 'CTR-2026-0405', end: '2027-06-30', value: 31200 }], notes: [] },
+  { id: 'sec', name: 'Sunrise Education Centre Pte Ltd', am: 'Jane Tan', rating: 'Healthy', ratedOn: '2026-09-15', pattern: 'stable', baseH: 9,
+    services: [
+      { id: 'sec-seo', type: 'seo', pe: 'Hafiz Rahman', contract: 'CTR-2026-0019', end: '2027-01-10', value: 10800 },
+      { id: 'sec-wdev', type: 'wdev', pe: 'Kenneth Goh', contract: 'CTR-2026-0020', end: '2026-11-30', value: 6500 }],
+    notes: [] },
+  { id: 'orw', name: 'Orchid Wellness Pte Ltd', am: 'Priya Nair', rating: 'Critical', ratedOn: '2026-10-08', pattern: 'stable', baseH: 10,
+    services: [{ id: 'orw-psoc', type: 'psoc', pe: 'Mei Ling Chua', contract: 'CTR-2026-0322', end: '2027-03-31', value: 12960 }], notes: [] },
+  { id: 'tpe', name: 'Tanjong Precision Engineering Pte Ltd', am: 'Marcus Lim', rating: 'Healthy', ratedOn: '2026-10-05', pattern: 'stable', baseH: 12,
+    services: [
+      { id: 'tpe-seo', type: 'seo', pe: 'Hafiz Rahman', contract: 'CTR-2026-0801', end: '2027-08-31', value: 28800 },
+      { id: 'tpe-wm', type: 'wmnt', pe: 'Kenneth Goh', contract: 'CTR-2026-0801', end: '2027-08-31', value: 2400 }], notes: [] },
+  { id: 'lum', name: 'Lumen Interiors Pte Ltd', am: 'Jane Tan', rating: 'Healthy', ratedOn: '2026-09-28', pattern: 'stable', baseH: 6,
+    services: [
+      { id: 'lum-gads', type: 'gads', pe: 'Siti Aminah', contract: 'CTR-2026-0510', end: '2027-05-31', value: 21600 },
+      { id: 'lum-psoc', type: 'psoc', pe: 'Mei Ling Chua', contract: 'CTR-2026-0510', end: '2027-05-31', value: 14400 }], notes: [] },
+  { id: 'bfx', name: 'Bayfront Fitness Pte Ltd', am: 'Priya Nair', rating: 'At Risk', ratedOn: '2026-09-18', pattern: 'stable', baseH: 8,
+    services: [{ id: 'bfx-seo', type: 'seo', pe: 'Hafiz Rahman', contract: 'CTR-2025-0915', end: '2026-09-30', value: 18000 }], notes: [] }
+];
+ORGS.push({ id: 'klc', name: 'Kopi Lane Catering Pte Ltd', am: '—', rating: '—', prospect: true, services: [], notes: [] });
+
+const S = (o) => Object.assign({ status: 'New', history: [], reinforced: 1 }, o);
+let SIGNALS = [
+  // ABC
+  S({ id: 'SG-1201', org: 'abc', service: 'abc-gads', cat: 'Exit intent', kind: 'event', source: 'Gmail', date: '2026-10-13',
+      title: 'Asked about notice period', quote: 'Ahead of our renewal in January, can you send the notice period for the Google Ads contract?',
+      history: [{ d: '2026-10-13', t: 'Detected in email from Daphne Lee' }] }),
+  S({ id: 'SG-1202', org: 'abc', service: 'abc-seo', cat: 'Dissatisfaction', kind: 'event', source: 'Gmail', date: '2026-10-13',
+      title: 'Complaint: reporting', quote: "The SEO report again doesn't show the keywords we agreed on.", reinforced: 2,
+      history: [{ d: '2026-09-29', t: 'Detected in email from Daphne Lee' }, { d: '2026-10-13', t: 'Reinforced: same complaint repeated' }] }),
+  S({ id: 'SG-1188', org: 'abc', service: 'abc-seo', cat: 'Delivery delay', kind: 'condition', source: 'CRM', date: '2026-09-27',
+      title: 'Milestone "Q3 technical audit" 18 days late', clears: 'Clears automatically when the milestone is marked complete.',
+      history: [{ d: '2026-09-27', t: 'Milestone passed its target date' }] }),
+  S({ id: 'SG-1176', org: 'abc', service: null, cat: 'Engagement drop', kind: 'trend', source: 'Gmail', date: '2026-09-17',
+      title: 'Replies slowing: 6h → 2.5 days over 4 weeks', detail: 'Client reply time has been above its usual range for 4 consecutive weeks. Fewer contacts replying (3 → 1).',
+      history: [{ d: '2026-10-12', t: 'Trend confirmed: 4 weeks above usual range, 2 indicators agree' }] }),
+  S({ id: 'SG-1203', org: 'abc', service: 'abc-seo', cat: 'Engagement drop', kind: 'condition', source: 'Gmail', date: '2026-10-08',
+      title: 'No reply to our September report email (7 days)', detail: 'We sent this on 08/10/2026 asking the client to confirm the keyword groups. There has been no reply; this client usually replies within about 6 hours.', clears: 'Clears itself when the client replies.',
+      history: [{ d: '2026-10-15', t: 'Still no reply after 7 days' }] }),
+  S({ id: 'SG-1099', org: 'abc', service: 'abc-wm', cat: 'Dissatisfaction', kind: 'event', source: 'Gmail', date: '2026-09-02', status: 'Dismissed',
+      title: 'Complaint: slow turnaround on banner update', quote: 'Could we get the homepage banner changed today? It has been two days.',
+      dismissReason: 'Resolved same day; client confirmed on a call.', history: [{ d: '2026-09-02', t: 'Detected' }, { d: '2026-09-03', t: 'Dismissed by Jane Tan: "Resolved same day; client confirmed on a call."' }] }),
+  // XYZ
+  S({ id: 'SG-1195', org: 'xyz', service: 'xyz-seo', cat: 'Exit intent', kind: 'event', source: 'Gmail', date: '2026-10-10',
+      title: 'Requested admin transfer for Search Console and GA4', quote: "Please add our new partner's email as an owner on Search Console and GA4 by Friday.",
+      history: [{ d: '2026-10-10', t: 'Detected' }, { d: '2026-10-10', t: 'HOD notified (Severe)' }] }),
+  S({ id: 'SG-1191', org: 'xyz', service: null, cat: 'Stakeholder change', kind: 'event', source: 'Gmail', date: '2026-10-08',
+      title: "Client's director newly copied in", quote: '(Director added to cc on the monthly report thread for the first time)' }),
+  // DEF
+  S({ id: 'SG-1160', org: 'def', service: null, cat: 'Engagement drop', kind: 'trend', source: 'Gmail', date: '2026-09-10',
+      title: 'Replies slowing: 4h → 1.8 days over 5 weeks', detail: 'Client reply time above its usual range for 5 weeks. Shorter replies; greetings dropped.' }),
+  S({ id: 'SG-1199', org: 'def', service: null, cat: 'Dissatisfaction', kind: 'event', source: 'Gmail', date: '2026-10-12',
+      title: 'Questioning value delivered', quote: 'Can you remind me what exactly we got for last month’s fee?' }),
+  // Harbourline
+  // Kopi Lane
+  S({ id: 'SG-1179', org: 'kpl', service: null, cat: 'Spend cut', kind: 'event', source: 'Gmail', date: '2026-10-06',
+      title: 'Budget cut mentioned', quote: 'Management is reviewing all marketing spend for next year, so we may need to scale back.' }),
+  S({ id: 'SG-1131', org: 'kpl', service: 'kpl-psoc', cat: 'Contract expiry', kind: 'condition', source: 'CRM', date: '2026-09-21',
+      title: 'Renewal in 66 days, no renewal discussion logged', clears: 'Clears automatically when a renewal discussion is logged.' }),
+  // Meridian
+  S({ id: 'SG-1158', org: 'mdg', service: 'mdg-seo', cat: 'Dissatisfaction', kind: 'event', source: 'Gmail', date: '2026-09-24', status: 'Actioned',
+      title: 'Complaint: rankings dropped', quote: "Our rankings for 'dental implants Singapore' have dropped off page one.", linked: 'Issue ISS-1042 (Action in progress)',
+      history: [{ d: '2026-09-24', t: 'Detected' }, { d: '2026-09-25', t: 'Issue ISS-1042 created by Priya Nair' }] }),
+  S({ id: 'SG-1187', org: 'mdg', service: 'mdg-seo', cat: 'Dissatisfaction', kind: 'event', source: 'Gmail', date: '2026-10-09',
+      title: 'Complaint: monthly report late', quote: 'This is the second month the report has come in after our management meeting.' }),
+  // Northpoint
+  S({ id: 'SG-1196', org: 'npr', service: 'npr-gads', cat: 'Competitor', kind: 'event', source: 'Gmail', date: '2026-10-11',
+      title: 'Competitor agency mentioned', quote: 'Another agency has offered to run our Ads with a lower management fee.' }),
+  S({ id: 'SG-1197', org: 'npr', service: null, cat: 'Stakeholder change', kind: 'event', source: 'Gmail', date: '2026-10-11',
+      title: "Client's CEO newly copied in", quote: '(CEO added to cc on the same thread)' }),
+  // Sunrise
+  S({ id: 'SG-1181', org: 'sec', service: null, cat: 'Stakeholder change', kind: 'event', source: 'Gmail', date: '2026-10-05',
+      title: 'New decision-maker joined', quote: 'Please loop in our new Head of Marketing, who will be reviewing our vendors.' }),
+  // Orchid
+  S({ id: 'SG-1184', org: 'orw', service: 'orw-psoc', cat: 'Exit intent', kind: 'event', source: 'Gmail', date: '2026-10-07', status: 'Actioned',
+      title: 'Intent to cancel', quote: "We'd like to stop Paid Social at the end of this month.", linked: 'Cancellation request CR-0087 (awaiting COO approval)',
+      history: [{ d: '2026-10-07', t: 'Detected; HOD notified' }, { d: '2026-10-08', t: 'Cancellation request CR-0087 logged by Priya Nair' }, { d: '2026-10-08', t: 'Client Health set to Critical by Priya Nair' }] }),
+  // Lumen
+  S({ id: 'SG-1170', org: 'lum', service: 'lum-psoc', cat: 'Spend cut', kind: 'event', source: 'Gmail', date: '2026-10-02',
+      title: 'Asked to reduce scope', quote: 'Could we drop the TikTok ads from the package from next month?' }),
+  S({ id: 'SG-1171', org: 'lum', service: 'lum-gads', cat: 'Delivery delay', kind: 'condition', source: 'CRM', date: '2026-10-03',
+      title: 'Commencement 12 days later than planned', clears: 'Clears automatically when actual commencement is recorded.' }),
+  // Bayfront
+  S({ id: 'SG-1166', org: 'bfx', service: 'bfx-seo', cat: 'Contract expiry', kind: 'condition', source: 'CRM', date: '2026-10-01',
+      title: 'Delivery continuing after contract expired on 30/09/2026', clears: 'Clears when a renewal is endorsed or delivery is stopped.' }),
+  S({ id: 'SG-1167', org: 'bfx', service: 'bfx-seo', cat: 'Dissatisfaction', kind: 'event', source: 'Gmail', date: '2026-10-01',
+      title: 'Complaint: report missing agreed keywords', quote: "The report still doesn't include the keyword groups we discussed." }),
+  S({ id: 'SG-1120', org: 'bfx', service: null, cat: 'Engagement drop', kind: 'condition', source: 'CRM', date: '2026-09-04',
+      title: 'No AM contact logged in 41 days', clears: 'Clears when a client interaction is logged.' }),
+];
+
+
+/* ---------- rules ---------- */
+const ACTIVE = ['New', 'Actioned'];
+const orgById = id => ORGS.find(o => o.id === id);
+const svcById = id => { for (const o of ORGS) for (const s of o.services) if (s.id === id) return s; return null; };
+const svcName = id => id ? SVC[svcById(id).type].name : 'Account-wide';
+const isActive = s => ACTIVE.includes(s.status);
+const activeSigs = o => orgSignals(o.id).filter(isActive);
+const orgSignals = oid => SIGNALS.filter(s => s.org === oid);
+const differs = o => o.rating === 'Healthy' && activeSigs(o).length > 0;
+const sortSig = (a, b) => D(b.date) - D(a.date);
+
+function rng(seed) { let s = seed % 2147483647; if (s <= 0) s += 2147483646; return () => (s = s * 16807 % 2147483647, (s - 1) / 2147483646); }
+const hash = str => [...str].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+
+/* ---------- client record data (all fictional; see PRD 3.3 and 8.3) ---------- */
+const HOD = { SEO: 'Daniel Ong', 'Paid Media': 'Tricia Lau', Web: 'Tricia Lau' };
+const RENEWAL_STATES = ['Not Started', 'Follow-Up Required', 'Discussion Ongoing', 'Pending Commercial Agreement', 'Pending Endorsement', 'Renewed', 'Not Renewing', 'Expired Without Renewal'];
+const ISSUE_STATUSES = ['Open', 'Investigating', 'Action in Progress', 'Pending Client', 'Resolved', 'Closed'];
+const isOpenIssue = i => !['Resolved', 'Closed'].includes(i.status);
+const addMonths = (s, n) => { const d = D(s); d.setMonth(d.getMonth() + n); return iso(d); };
+const dayAgo = n => iso(new Date(TODAY.getTime() - n * 864e5));
+const FIRST = ['Daphne', 'Priscilla', 'Gerald', 'Nurul', 'Victor', 'Hui Min', 'Kelvin', 'Sharmila', 'Edwin', 'Joanne', 'Farhan', 'Mei Xin', 'Raymond', 'Alicia', 'Darren', 'Sook Fun'];
+const LAST = ['Lee', 'Wong', 'Teo', 'Aini', 'Sim', 'Chua', 'Ang', 'Pillai', 'Lim', 'Ng', 'Salleh', 'Tan', 'Koh', 'Yeo', 'Chan', 'Ho'];
+const STREETS = ['Robinson Road', 'Cecil Street', 'Ubi Avenue 3', 'Kallang Way', 'Tampines Street 92', 'Jurong Gateway Road', 'Orchard Road', 'Anson Road'];
+const slug = s => s.replace(/ Pte Ltd$/i, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+/* service-level overrides: status, term, renewal state, service health */
+const SVX = {
+  'abc-gads': { term: 24, health: ['Critical', '2026-10-14', 'Client asked for the contract notice period ahead of renewal', 'Exec call with the client this week', 'Jane Tan', 'Retention call and renewal offer', 'Jane Tan', '2026-10-20'] },
+  'abc-wm': { term: 24 },
+  'abc-seo': { health: ['At Risk', '2026-10-01', 'Client raised concerns about keyword reporting', 'Send the revised keyword report and review it with the client', 'Jane Tan', '', '', '2026-10-08'] },
+  'lum-gads': { status: 'Ready to Commence', start: '2026-10-03', actual: null, note: 'Planned commencement was 03/10/2026; delivery has not started.' },
+  'bfx-seo': { status: 'Expired / Uncontracted Delivery', renewal: 'Expired Without Renewal', health: ['At Risk', '2026-09-18', 'Contract expired; delivery continuing without cover'] },
+  'orw-psoc': { renewal: 'Not Renewing', note: 'Cancellation request CR-0087 awaiting COO approval. Status stays Active until approved.', health: ['Critical', '2026-10-08', 'Client intends to stop Paid Social'] },
+  'xyz-seo': { health: ['At Risk', '2026-10-11', 'Admin access transfer request and overdue invoice'] },
+  'mdg-seo': { health: ['At Risk', '2026-09-25', 'Rankings complaint; ISS-1042 in progress'] },
+  'hbl-wdev': { renewal: 'Discussion Ongoing' }
+};
+const nowStamp = () => { const t = new Date(); const at = TODAY.getTime() + t.getHours() * 36e5 + t.getMinutes() * 6e4 + t.getSeconds() * 1e3; return { at, time: pad(t.getHours()) + ':' + pad(t.getMinutes()) }; };
+const atOf = d => D(d).getTime() + 12 * 36e5;
+ORGS.forEach(o => { if (o.ratedOn) o.ratedAt = atOf(o.ratedOn); });
+const SVI = {};
+ORGS.forEach(o => o.services.forEach(sv => {
+  const x = SVX[sv.id] || {}; const term = x.term || 12; const days = daysBetween(TODAY, D(sv.end));
+  const start = x.start || addMonths(sv.end, -term);
+  SVI[sv.id] = { status: x.status || 'Active', start, actual: x.actual === undefined ? start : x.actual, note: x.note || '',
+    renewal: x.renewal || (days <= 0 ? 'Expired Without Renewal' : days <= 90 ? 'Follow-Up Required' : 'Not Started'),
+    health: x.health ? { level: x.health[0], on: x.health[1], at: atOf(x.health[1]), reason: x.health[2], next: x.health[3] || '', by: x.health[4] || o.am, plan: x.health[5] || '', recOwner: x.health[6] || '', due: x.health[7] || '' } : { level: 'Healthy', on: o.ratedOn, at: atOf(o.ratedOn), reason: '', next: '', by: o.am, plan: '', recOwner: '', due: '' } };
+}));
+
+/* organisation master data */
+const DET = {};
+ORGS.filter(o => !o.prospect).forEach(o => {
+  const r = rng(hash('d' + o.id));
+  const since = o.services.map(s => SVI[s.id].start).sort()[0];
+  DET[o.id] = { trading: o.name.replace(/ Pte Ltd$/i, ''), uen: '20' + (10 + Math.floor(r() * 14)) + (10000 + Math.floor(r() * 89999)) + 'ABDEKMNPRSTX'[Math.floor(r() * 12)],
+    address: `${10 + Math.floor(r() * 80)} ${STREETS[Math.floor(r() * STREETS.length)]} #0${1 + Math.floor(r() * 9)}-${10 + Math.floor(r() * 80)}, Singapore`,
+    web: slug(o.name) + '.example', since };
+});
+
+/* contacts (people associated with the organisation) */
+const CON = {
+  abc: [{ name: 'Daphne Lee', title: 'Marketing Director', types: ['Commercial', 'Operational'], primary: true }, { name: 'Raymond Chua', title: 'Finance Manager', types: ['Billing'] }, { name: 'Edwin Ang', title: 'Managing Director', types: ['Authorised signatory'] }],
+  xyz: [{ name: 'Priscilla Wong', title: 'Head of Digital', types: ['Commercial', 'Operational'], primary: true }, { name: 'Gerald Teo', title: 'Director', types: ['Authorised signatory'], note: 'Copied in for the first time on 08/10/2026' }, { name: 'Hui Min Salleh', title: 'Accounts Executive', types: ['Billing'] }],
+  def: [{ name: 'Nurul Aini', title: 'Marketing Manager', types: ['Commercial', 'Operational'], primary: true }, { name: 'Victor Sim', title: 'Director', types: ['Authorised signatory'] }, { name: 'Alicia Ng', title: 'Finance Executive', types: ['Billing'] }]
+};
+ORGS.filter(o => !o.prospect && !CON[o.id]).forEach(o => {
+  const r = rng(hash('c' + o.id)); const nm = () => FIRST[Math.floor(r() * FIRST.length)] + ' ' + LAST[Math.floor(r() * LAST.length)];
+  CON[o.id] = [{ name: nm(), title: 'Marketing Manager', types: ['Commercial', 'Operational'], primary: true }, { name: nm(), title: 'Finance Executive', types: ['Billing'] }, { name: nm(), title: 'Director', types: ['Authorised signatory'] }];
+});
+const emailOf = (o, c) => c.name.toLowerCase().replace(/[^a-z]+/g, '.') + '@' + DET[o.id].web;
+
+/* activities and follow-up tasks */
+const ACT = {
+  abc: [
+    { date: '2026-10-13', type: 'Email', by: 'Daphne Lee (client)', internal: false, svc: null, text: 'Email on the September SEO report: keywords not as agreed; asked for the Google Ads notice period; still waiting on a revised invoice.', src: 'Gmail sync' },
+    { date: '2026-10-03', type: 'Note', by: 'Jane Tan', internal: true, svc: 'abc-seo', text: 'Client praised the August report on a call; the dashboard is much clearer.' },
+    { date: '2026-09-12', type: 'Meeting', by: 'Jane Tan', internal: false, svc: null, text: 'Quarterly review with Daphne. Agreed to add a keyword group report from Q4. Client asked about a website refresh.' },
+    { date: '2026-08-20', type: 'Call', by: 'Siti Aminah', internal: false, svc: 'abc-gads', text: 'Walked through Google Ads performance; client happy with lead volume.' }],
+  bfx: [{ date: '2026-09-04', type: 'Call', by: 'Priya Nair', internal: false, svc: null, text: 'Short call with the client; they asked about contract renewal terms. No follow-up logged.' }]
+};
+const TASKS = {
+  abc: [{ id: 'T-301', text: 'Send revised keyword report to Daphne', owner: 'Hafiz Rahman', due: '2026-10-10', done: false, svc: 'abc-seo' }, { id: 'T-302', text: 'Prepare renewal proposal for Google Ads', owner: 'Jane Tan', due: '2026-11-15', done: false, svc: 'abc-gads' }]
+};
+ORGS.filter(o => !o.prospect).forEach(o => {
+  const r = rng(hash('a' + o.id)); const c = CON[o.id][0]; const pe = o.services[0].pe;
+  if (!ACT[o.id]) ACT[o.id] = [
+    { date: dayAgo(9 + Math.floor(r() * 8)), type: 'Call', by: o.am, internal: false, svc: null, text: `Monthly check-in with ${c.name}. No concerns raised.` },
+    { date: dayAgo(24 + Math.floor(r() * 6)), type: 'Email', by: pe, internal: false, svc: o.services[0].id, text: 'Monthly performance report sent to the client.' },
+    { date: dayAgo(50 + Math.floor(r() * 10)), type: 'Note', by: o.am, internal: true, svc: null, text: `Reviewed the account plan. ${c.name} remains the main decision-maker.` }];
+  if (!TASKS[o.id]) {
+    const fu = o.services.find(s => SVI[s.id].renewal === 'Follow-Up Required' && daysBetween(TODAY, D(s.end)) > 0);
+    TASKS[o.id] = fu ? [{ id: 'T-' + (400 + Math.floor(r() * 99)), text: `Open the renewal discussion for ${SVC[fu.type].name}`, owner: o.am, due: dayAgo(-14), done: false, svc: fu.id }] : [];
+  }
+});
+
+/* issues (PRD 8.3.5) and opportunities (PRD 5.2) */
+const ISSUES = [
+  { id: 'ISS-1042', org: 'mdg', svc: 'mdg-seo', title: 'Rankings dropped off page one', cat: 'Delivery quality', sev: 'High', owner: 'Hafiz Rahman', status: 'Action in Progress', reported: '2026-09-24', target: '2026-10-20', sig: 'SG-1158' },
+  { id: 'ISS-0981', org: 'mdg', svc: 'mdg-seo', title: 'Monthly report delivered late', cat: 'Reporting', sev: 'Medium', owner: 'Hafiz Rahman', status: 'Closed', reported: '2026-05-04', target: '2026-05-20', closed: '2026-07-20' }
+];
+const OPPS = [
+  { id: 'OPP-2107', org: 'abc', name: 'Website refresh (upsell)', stage: 'Proposal Preparation', est: 18000, owner: 'Aisha Rahim (Sales)', created: '2026-09-14' },
+  { id: 'OPP-2111', org: 'def', name: 'Paid Social add-on', stage: 'Presented', est: 9600, owner: 'Jane Tan (AM)', created: '2026-09-02' },
+  { id: 'OPP-2098', org: 'hbl', name: 'Website Development renewal', stage: 'Consideration / Negotiation', est: 12000, owner: 'Priya Nair (AM)', created: '2026-09-20' }
+];
+
+/* billing: QBB is authoritative for invoices and payment status (PRD 3.3.7) */
+const INV = []; const SCHED = [];
+(() => {
+  let n = 24700;
+  ORGS.filter(o => !o.prospect).forEach(o => {
+    const groups = {}; o.services.forEach(s => (groups[s.contract] = groups[s.contract] || []).push(s));
+    Object.entries(groups).forEach(([ct, list]) => {
+      const amt = Math.round(list.reduce((a, s) => a + s.value, 0) / 12); const end = list.map(s => s.end).sort().pop();
+      ['2026-07-01', '2026-08-01', '2026-09-01', '2026-10-01'].forEach(d => { if (d > end) return; n += 1 + Math.floor(rng(n)() * 3);
+        INV.push({ no: 'INV-' + n, org: o.id, contract: ct, issued: d, due: addMonths(d, 1), amount: amt, status: d === '2026-10-01' ? 'Issued' : 'Paid', note: '' }); });
+      ['2026-11-01', '2026-12-01'].forEach(d => { if (d <= end) SCHED.push({ org: o.id, contract: ct, date: d, amount: amt, status: 'Pending' }); });
+    });
+  });
+  const set = (o, f, patch) => { const i = INV.filter(x => x.org === o && f(x))[0]; if (i) Object.assign(i, patch); };
+  set('abc', x => x.issued === '2026-10-01', { status: 'Query', note: 'Client asked for a revised invoice (13/10). Routed to Finance as a task.' });
+  set('xyz', x => x.issued === '2026-07-01', { no: 'INV-24817', issued: '2026-07-05', due: '2026-08-04', amount: 4000, status: 'Overdue' });
+  set('sec', x => x.issued === '2026-08-01', { no: 'INV-24790', amount: 5500, due: '2026-09-05', status: 'Overdue', note: 'Payment promise missed on 09/10/2026.' });
+})();
+
+/* health history (PRD 8.3.4): newest first, never overwritten */
+const HH = {};
+const AM_HOD = 'Grace Teo', COO = 'Rachel Lee';
+const escText = (level, sid) => { if (level === 'Healthy') return ''; const hod = sid ? `${HOD[SVC[svcById(sid).type].line]} (Service HOD)` : `${AM_HOD} (AM HOD)`; return level === 'Critical' ? `Escalated to ${hod} and ${COO} (COO)` : `Visible to ${hod}`; };
+const HREASON = { xyz: 'Overdue invoice and admin access transfer request', mdg: 'Rankings complaint; recovery in progress', orw: 'Client intends to cancel Paid Social', bfx: 'Contract expired and low engagement' };
+ORGS.filter(o => !o.prospect).forEach(o => {
+  const list = [{ date: o.ratedOn, scope: 'Client', sid: null, level: o.rating, by: o.am, reason: o.rating === 'Healthy' ? 'No significant concerns at the latest review' : HREASON[o.id] || '', next: o.rating === 'Healthy' ? '' : 'Weekly check-in; HOD informed' }];
+  if (o.rating !== 'Healthy') list.push({ date: '2026-03-02', scope: 'Client', level: 'Healthy', by: o.am, reason: 'Onboarding completed with no concerns', next: '' });
+  o.services.forEach(s => { const h = SVI[s.id].health; list.push({ date: h.on, scope: SVC[s.type].name, sid: s.id, level: h.level, by: h.by, reason: h.reason || (h.level === 'Healthy' ? 'No significant concerns at the latest review' : ''), next: h.next, due: h.due, plan: h.plan, recOwner: h.recOwner }); });
+  HH[o.id] = list.sort((a, b) => D(b.date) - D(a.date));
+});
+
+const peopleFor = o => [...new Set([o.am, ...o.services.map(s => s.pe), ...o.services.map(s => HOD[SVC[s.type].line])])];
+const orgIssues = id => ISSUES.filter(i => i.org === id);
+const orgOpps = id => OPPS.filter(i => i.org === id);
+const orgInv = id => INV.filter(i => i.org === id).sort((a, b) => D(b.issued) - D(a.issued));
+const orgTasks = id => TASKS[id] || [];
+const isLive = sv => ['Active', 'Ready to Commence', 'Pending Onboarding', 'Suspended', 'Expired / Uncontracted Delivery'].includes(SVI[sv.id].status);
+const overdueTasks = id => orgTasks(id).filter(t => !t.done && D(t.due) < TODAY);
+
+/* ---------- state ---------- */
+const state = { org: 'abc', catFilter: { cat: 'all' }, src: 'all', sentGran: 'week', sentSel: null, page: 'overview', modal: null, open: { health: false, hist: false, types: false }, drawer: null, mode: null };
+const canEditHealth = () => true;
+
+/* ---------- small renderers ---------- */
+const catTag = c => `<span class="cattag" data-c="${slug(c)}">${esc(c)}</span>`;
+const ratingBadge = o => `<span class="rating r-${o.rating.replace(' ', '')}">AM rating: ${esc(o.rating)}</span>`;
+const anno = html => `<div class="anno">${html}</div>`;
+
+/* ---------- views ---------- */
+function render() {
+  document.getElementById('app').innerHTML = viewAccount();
+  renderDrawer(); renderModal();
+}
+/* ---------- client record: shell and tabs ---------- */
+const PAGES = [['overview', 'Overview'], ['services', 'Services & contracts'], ['contacts', 'Contacts'], ['activity', 'Activity'], ['issues', 'Issues'], ['opps', 'Opportunities'], ['billing', 'Billing'], ['risk', 'Health & risk']];
+const ENABLED = ['overview', 'risk'];
+const dm = (html, cls = '') => `<div class="dm ${cls}"><span class="dm-tag">Dummy data · not in scope</span><div class="dm-body" inert aria-hidden="true">${html}</div></div>`;
+const hBadge = l => `<span class="rating r-${l.replace(' ', '')}">${esc(l)}</span>`;
+const stTag = s => `<span class="tag st-${s.split(' ')[0].toLowerCase()}">${esc(s)}</span>`;
+const tbl = (head, rows, empty, cls) => `<div class="tbl-wrap"><table class="${cls || ''}"><thead><tr>${head.map(h => `<th class="${h[1] || ''}">${h[0]}</th>`).join('')}</tr></thead><tbody>${rows || `<tr><td colspan="${head.length}" class="empty">${empty}</td></tr>`}</tbody></table></div>`;
+const sec = (title, body, right = '') => `<section class="section"><header><h2>${title}</h2><div class="spacer"></div>${right}</header>${body}</section>`;
+const goBtn = (page, label) => !ENABLED.includes(page) ? '' : `<button class="btn ghost sm" data-page="${page}">${label}</button>`;
+const svcLabel = id => id ? esc(svcName(id)) : 'Account-wide';
+const daysTo = e => daysBetween(TODAY, D(e));
+const endCell = e => { const n = daysTo(e); return `<span class="num">${fmt(e)}</span>${n < 0 ? ' <span class="pill lvl-severe">Ended</span>' : n <= 90 ? ` <span class="hint">(${n} days)</span>` : ''}`; };
+
+function attention(o) {
+  const out = []; const sigs = orgSignals(o.id).filter(isActive);
+  if (sigs.length) out.push({ text: `${sigs.length} active risk signal${sigs.length === 1 ? '' : 's'}`, page: 'risk', go: 'Review' });
+  o.services.forEach(sv => { const i = SVI[sv.id], n = daysTo(sv.end), nm = SVC[sv.type].name;
+    if (i.status.startsWith('Expired')) out.push({ text: `${nm}: contract ended ${fmt(sv.end)} but delivery continues`, page: 'services', go: 'Open' });
+    else if (n > 0 && n <= 90 && ['Not Started', 'Follow-Up Required'].includes(i.renewal)) out.push({ text: `${nm} ends in ${n} days; renewal: ${i.renewal.toLowerCase()}`, page: 'services', go: 'Open' });
+    if (i.status === 'Ready to Commence' && i.note) out.push({ text: `${nm}: ${i.note}`, page: 'services', go: 'Open' }); });
+  const od = orgInv(o.id).filter(x => x.status === 'Overdue'); if (od.length) out.push({ text: `${od.length} overdue invoice${od.length === 1 ? '' : 's'} (${money(od.reduce((a, x) => a + x.amount, 0))})`, page: 'billing', go: 'Open' });
+  const iss = orgIssues(o.id).filter(i => isOpenIssue(i) && i.target && D(i.target) < TODAY); if (iss.length) out.push({ text: `${iss.length} issue${iss.length === 1 ? '' : 's'} past target date`, page: 'issues', go: 'Open' });
+  const ot = overdueTasks(o.id); if (ot.length) out.push({ text: `${ot.length} overdue follow-up${ot.length === 1 ? '' : 's'}: ${ot[0].text}`, page: 'activity', go: 'Open' });
+  if (differs(o)) out.push({ text: `${sigs.length} active risk signal${sigs.length === 1 ? '' : 's'} but the client is rated Healthy. Consider a reassessment.`, page: 'risk', go: 'Open' });
+  return out;
+}
+
+function viewAccount() {
+  const o = orgById(state.org); const d = DET[o.id];
+  const live = o.services.filter(isLive); const annual = live.filter(s => !SVI[s.id].status.startsWith('Expired')).reduce((a, s) => a + s.value, 0);
+  const nextEnd = live.map(s => s.end).filter(e => D(e) >= TODAY).sort()[0];
+  const sigs = activeSigs(o);
+  const openIss = orgIssues(o.id).filter(isOpenIssue).length; const openFu = orgTasks(o.id).filter(t => !t.done).length;
+  const tabs = PAGES.map(([k, l]) => `<button role="tab" data-page="${k}" aria-selected="${state.page === k}" ${ENABLED.includes(k) ? '' : 'disabled title="Not part of this prototype"'}>${l}${k === 'risk' && sigs.length ? `<span class="ct">${sigs.length}</span>` : ''}</button>`).join('');
+  const body = { overview: pgOverview, risk: viewRisk }[state.page](o);
+  return `<div class="idcard"><div class="top"><div><h1>${esc(o.name)}</h1>
+      <div class="sub"><span class="tag ${live.length ? 'ok' : ''}">${live.length ? 'Active client' : 'Former client'}</span><span>Trading as ${esc(d.trading)}</span><span>UEN <span class="mono">${d.uen}</span></span><span>Client health ${hBadge(o.rating)} <span class="hint">assessed ${fmt(o.ratedOn)}</span></span></div></div>
+      <div class="spacer"></div>
+      <div class="row"><button class="btn" data-modal="activity">Log activity</button><button class="btn" data-modal="issue">Create issue</button></div></div>
+    <div class="facts"><div class="fact"><div class="l">Primary AM</div><div class="v">${esc(o.am)}</div></div>
+      <div class="dm fact"><div class="dm-body"><div class="fact"><div class="l">Active services</div><div class="v">${live.length}</div></div></div></div>
+      <div class="dm fact"><div class="dm-body"><div class="fact"><div class="l">Annual contract value</div><div class="v num">${money(annual)}</div></div></div></div>
+      <div class="fact"><div class="l">Next contract end</div><div class="v num">${nextEnd ? fmt(nextEnd) : '—'}</div></div>
+      <div class="dm fact"><div class="dm-body"><div class="fact"><div class="l">Client since</div><div class="v num">${fmt(d.since)}</div></div></div></div>
+      <div class="dm fact"><div class="dm-body"><div class="fact"><div class="l">Open issues</div><div class="v num">${openIss}</div></div></div></div></div></div>
+    <div class="scopebar"><b>Prototype focus: risk signals.</b> All data is fictional. Blurred sections are placeholders with dummy data, and greyed-out tabs are not part of this prototype.</div><div class="pagetabs" role="tablist">${tabs}</div>${body}`;
+}
+
+function pgOverview(o) {
+  const S = (...a) => dm(sec(...a));
+  const at = attention(o); const d = DET[o.id]; const sigs = orgSignals(o.id).filter(isActive).sort(sortSig);
+  const attn = at.length ? `<ul class="attn">${at.map(a => `<li><span class="tx">${esc(a.text)}</span>${goBtn(a.page, a.go)}</li>`).join('')}</ul>` : '<div class="empty">Nothing needs attention right now.</div>';
+  const svcRows = o.services.map(sv => { const i = SVI[sv.id]; return `<tr><td><b>${SVC[sv.type].name}</b></td><td>${stTag(i.status)}</td><td>${esc(sv.pe)}</td><td>${hBadge(i.health.level)}</td><td>${endCell(sv.end)}</td></tr>`; }).join('');
+  const acts = ACT[o.id].slice().sort((a, b) => D(b.date) - D(a.date)).slice(0, 4);
+  const fu = orgTasks(o.id).filter(t => !t.done).sort((a, b) => D(a.due) - D(b.due));
+  const team = o.services.map(s => [SVC[s.type].name + ' PE', s.pe]);
+  const con = CON[o.id].slice(0, 3);
+  const inv = orgInv(o.id); const openOpps = orgOpps(o.id);
+  return `<div class="cols"><div>
+    ${sec('Risk signals', sigs.length ? sigs.slice(0, 3).map(s => `<button class="sigmini" data-open-sig="${s.id}">${catTag(s.cat)}<span><b>${esc(s.title)}</b> <span class="hint">· ${svcLabel(s.service)}</span></span><span class="src">${esc(s.source)} · ${fmtShort(s.date)}</span></button>`).join('') : '<div class="empty">No active signals.</div>', goBtn('risk', 'Open risk signals'))}
+    ${S('Needs attention', attn)}
+    ${S('Services', tbl([['Service'], ['Status'], ['PE'], ['Health'], ['Contract ends']], svcRows), goBtn('services', 'All services & contracts'))}
+    ${S('Recent activity', `<ul class="tl">${acts.map(a => `<li><span class="when">${fmt(a.date)}</span><div>${esc(a.text)}<div class="meta">${a.type} · ${esc(a.by)}${a.internal ? ' · internal note' : ''}</div></div></li>`).join('')}</ul>`, goBtn('activity', 'All activity'))}
+  </div><aside>
+    ${S('Follow-ups', fu.length ? `<ul class="list">${fu.map(t => `<li><span>${esc(t.text)}<div class="sub2">${esc(t.owner)}</div></span><span class="num ${D(t.due) < TODAY ? 'bad' : ''}" style="${D(t.due) < TODAY ? 'color:var(--sev-severe)' : ''}">${fmtShort(t.due)}${D(t.due) < TODAY ? ' overdue' : ''}</span></li>`).join('')}</ul>` : '<div class="empty">No open follow-ups.</div>')}
+    ${S('Account team', `<ul class="list"><li><span>${esc(o.am)}<div class="sub2">Primary AM</div></span></li>${[...new Map(o.services.map(s => [s.pe + SVC[s.type].name, s])).values()].map(s => `<li><span>${esc(s.pe)}<div class="sub2">PE · ${SVC[s.type].name}</div></span></li>`).join('')}${[...new Set(o.services.map(s => HOD[SVC[s.type].line]))].map(h => `<li><span>${esc(h)}<div class="sub2">Service HOD</div></span></li>`).join('')}</ul>`)}
+    ${S('Key contacts', `<ul class="list">${con.map(c => `<li><span>${esc(c.name)}<div class="sub2">${esc(c.title)} · ${c.types.join(', ')}</div></span></li>`).join('')}</ul>`, goBtn('contacts', 'All'))}
+    ${S('Organisation', `<dl class="kv" style="padding:12px 16px;margin:0"><dt>Legal name</dt><dd>${esc(o.name)}</dd><dt>UEN</dt><dd class="mono">${d.uen}</dd><dt>Address</dt><dd>${esc(d.address)}</dd><dt>Website</dt><dd>${d.web}</dd><dt>Email domain</dt><dd>${d.web}</dd></dl>`)}
+    ${S('Commercial', `<ul class="list"><li><span>Open opportunities</span><b class="num">${openOpps.length}</b></li><li><span>Unpaid invoices</span><b class="num">${inv.filter(x => ['Overdue', 'Query', 'Issued'].includes(x.status)).length}</b></li></ul>`)}
+  </aside></div>`;
+}
+
+const whenTxt = h => fmt(h.date || h.on) + (h.time ? ' ' + h.time : '');
+const dueTxt = d => d ? ` · due ${fmt(d)}${D(d) < TODAY ? ' <b style="color:var(--sev-severe)">overdue</b>' : ''}` : '';
+function healthCard(o) {
+  const rows = o.services.map(sv => { const h = SVI[sv.id].health; const e = escText(h.level, sv.id);
+    return `<div class="hrow"><div class="hname"><b>${SVC[sv.type].name}</b>${h.reason ? `<span class="hint">${esc(h.reason)}</span>` : ''}${h.next ? `<span class="hint">Next: ${esc(h.next)}${dueTxt(h.due)}</span>` : ''}${e ? `<span class="hint">${esc(e)}</span>` : ''}</div>
+      <div>${hBadge(h.level)}</div><div class="num hint">${whenTxt(h)}</div><div class="hint">${esc(h.by)}</div>
+      <div class="hact"><button class="btn sm" data-modal="health" data-sid="${sv.id}" aria-label="Reassess ${SVC[sv.type].name}">Reassess</button></div></div>`; }).join('');
+  const ce = escText(o.rating, null);
+  return `<section class="section hc">
+    <div class="hc-top"><div class="hc-main"><div class="eyebrow">Client health</div>
+        <div class="hc-rate"><span class="rating lg r-${o.rating.replace(' ', '')}">${esc(o.rating)}</span><span class="hint">Assessed ${fmt(o.ratedOn)}${o.ratedTime ? ' ' + o.ratedTime : ''} by ${esc(o.am)}${ce ? ' · ' + esc(ce) : ''}</span></div></div>
+      <button class="btn primary" data-modal="health">Reassess client health</button></div>
+    <div class="hc-svc"><div class="hrow head"><div>Services (${o.services.length})</div><div>Health</div><div>Last assessed</div><div>Assessed by</div><div></div></div>${rows}</div>
+    <details class="hc-hist" data-ref="health" ${state.open.health ? 'open' : ''}><summary>Assessment history <span class="num hint">(${HH[o.id].length})</span></summary>${healthHistory(o)}</details>
+    <div class="hint hc-foot">Signals prompt a reassessment; a person decides the rating. Client and service health are rated separately.</div></section>`;
+}
+const healthHistory = o => `<ul class="tl">${HH[o.id].map(h => { const e = escText(h.level, h.sid); return `<li><span class="when">${whenTxt(h)}</span><div>${hBadge(h.level)} <b>${esc(h.scope)}</b> by ${esc(h.by)}${h.reason ? `<div>${esc(h.reason)}</div>` : ''}${h.next ? `<div class="meta">Next action: ${esc(h.next)}${h.owner ? ' · owner ' + esc(h.owner) : ''}${dueTxt(h.due)}</div>` : ''}${h.plan ? `<div class="meta">Recovery plan: ${esc(h.plan)} · recovery owner ${esc(h.recOwner)}</div>` : ''}${e ? `<div class="meta">${esc(e)}</div>` : ''}</div></li>`; }).join('')}</ul>`;
+
+/* ---------- modals ---------- */
+const ownerOpts = o => peopleFor(o).map(p => `<option>${esc(p)}</option>`).join('');
+const svcOpts = (o, sel) => `<option value="">Account-wide</option>` + o.services.map(s => `<option value="${s.id}" ${s.id === sel ? 'selected' : ''}>${SVC[s.type].name}</option>`).join('');
+function renderModal() {
+  const h = document.getElementById('modalHost'); const m = state.modal; if (!m) { h.innerHTML = ''; return; }
+  const o = orgById(state.org); const sig = m.sig && SIGNALS.find(x => x.id === m.sig);
+  let title, fields, save;
+  if (m.type === 'activity') {
+    title = 'Log activity'; save = 'Save activity';
+    fields = `<div class="two"><label class="f">Type<select id="mType"><option>Meeting</option><option>Call</option><option>Email</option><option>Message</option><option>Note</option></select></label><label class="f">Date<input type="date" id="mDate" value="${iso(TODAY)}"></label></div>
+      <div class="two"><label class="f">Related service<select id="mSvc">${svcOpts(o)}</select></label><label class="f">Visibility<select id="mVis"><option value="internal">Internal note</option><option value="client">Client-facing communication</option></select></label></div>
+      <label class="f">Summary, feedback and agreed next actions<textarea id="mText" placeholder="What was discussed or agreed?"></textarea></label>
+      <div class="eyebrow">Optional follow-up</div><label class="f">Follow-up<input type="text" id="mFu" placeholder="e.g. Send revised proposal"></label>
+      <div class="two"><label class="f">Owner<select id="mFuOwner">${ownerOpts(o)}</select></label><label class="f">Due<input type="date" id="mFuDue" value="${dayAgo(-7)}"></label></div>`;
+  } else if (m.type === 'issue') {
+    title = 'Create issue'; save = 'Create issue';
+    fields = `${sig ? `<div class="hint">From signal ${sig.id}: ${esc(sig.title)}</div>` : ''}
+      <label class="f">Title<input type="text" id="iTitle" value="${esc(sig ? sig.title : '')}"></label>
+      <div class="two"><label class="f">Affected service<select id="iSvc">${svcOpts(o, sig && sig.service)}</select></label><label class="f">Category<select id="iCat"><option>Reporting</option><option>Delivery quality</option><option>Communication</option><option>Billing</option><option>Timeline</option><option>Other</option></select></label></div>
+      <div class="two"><label class="f">Severity<select id="iSev"><option>Low</option><option selected>Medium</option><option>High</option></select></label><label class="f">Accountable owner (required)<select id="iOwner">${ownerOpts(o)}</select></label></div>
+      <label class="f">Reported by<select id="iBy">${CON[o.id].map(c => `<option>${esc(c.name)} (client)</option>`).join('')}${peopleFor(o).map(p => `<option>${esc(p)} (internal)</option>`).join('')}</select></label>
+      <label class="f">Target resolution date<input type="date" id="iTarget" value="${dayAgo(-14)}"></label>
+      <label class="f">Description<textarea id="iDesc">${esc(sig && sig.quote ? '“' + sig.quote + '”' : '')}</textarea></label>`;
+  } else {
+    title = 'Reassess health'; save = 'Save assessment';
+    const cur = m.sid ? SVI[m.sid].health.level : o.rating;
+    fields = `${m.notice ? `<div class="hc-alert" style="margin:0"><b>⚠ Required</b><span>${esc(m.notice)}</span></div>` : ''}<label class="f">Scope<select id="hScope"><option value="">Client (overall relationship)</option>${o.services.map(s => `<option value="${s.id}" ${s.id === m.sid ? 'selected' : ''}>Service: ${SVC[s.type].name}</option>`).join('')}</select></label>
+      <div class="opts" role="radiogroup" aria-label="Health">${['Healthy', 'At Risk', 'Critical'].map(r => `<label class="toggle"><input type="radio" name="hr" value="${r}" ${cur === r ? 'checked' : ''}> ${r}</label>`).join('')}</div>
+      <div data-for="At Risk Critical" ${['At Risk', 'Critical'].includes(cur) ? '' : 'hidden'} style="display:grid;gap:12px"><label class="f">Reason (required)<textarea id="hReason"></textarea></label>
+        <div class="two"><label class="f">Next action (required)<input type="text" id="hNext"></label><label class="f">Owner<select id="hOwner">${ownerOpts(o)}</select></label></div>
+        <label class="f">Next action due<input type="date" id="hDue" value="${dayAgo(-7)}"></label></div>
+      <div data-for="Critical" ${cur === 'Critical' ? '' : 'hidden'} style="display:grid;gap:12px"><div class="two"><label class="f">Recovery owner (required)<select id="hRecOwner">${ownerOpts(o)}</select></label><label class="f">Recovery plan (required)<input type="text" id="hPlan"></label></div>
+        <div class="hint">Critical escalates immediately to the relevant HOD and the CEO/COO. At Risk is visible to the relevant HOD.</div></div>
+      <div class="hint">Previous assessments are kept; this adds a new one.</div>`;
+  }
+  h.innerHTML = `<div class="modal"><div class="bg" data-modal-close></div><div class="panel" role="dialog" aria-modal="true" aria-labelledby="mTitle"><header><h2 id="mTitle">${title}</h2><button class="x btn sm" data-modal-close aria-label="Close">✕</button></header><div class="fields">${fields}</div><div class="pfoot"><button class="btn" data-modal-close>Cancel</button><button class="btn primary" data-modal-save>${save}</button></div></div></div>`;
+}
+const val = id => (document.getElementById(id) || {}).value || '';
+function saveModal() {
+  const m = state.modal; const o = orgById(state.org); let sid_ = null, pick_ = null;
+  if (m.type === 'activity') {
+    const text = val('mText').trim(); if (!text) { toast('Add a summary first'); return; }
+    ACT[o.id].push({ date: val('mDate') || iso(TODAY), type: val('mType'), by: who(), internal: val('mVis') === 'internal', svc: val('mSvc') || null, text });
+    const fu = val('mFu').trim(); if (fu) TASKS[o.id].push({ id: nextId('T'), text: fu, owner: val('mFuOwner'), due: val('mFuDue'), done: false, svc: val('mSvc') || null });
+    toast('Activity logged' + (fu ? ' with follow-up' : ''));
+  } else if (m.type === 'issue') {
+    const title = val('iTitle').trim(); if (!title) { toast('Add a title first'); return; }
+    const id = nextId('ISS'); const sig = m.sig && SIGNALS.find(x => x.id === m.sig);
+    ISSUES.push({ id, org: o.id, svc: val('iSvc') || null, title, cat: val('iCat'), sev: val('iSev'), by: val('iBy'), owner: val('iOwner'), status: 'Open', reported: iso(TODAY), target: val('iTarget') || null, sig: sig ? sig.id : null });
+    if (sig) { sig.status = 'Actioned'; sig.linked = `Issue ${id} (Open)`; log(sig, `Issue ${id} created by ${who()}`); }
+    toast(`Issue ${id} created, owner ${val('iOwner')}`); 
+  } else {
+    const pick = (document.querySelector('input[name="hr"]:checked') || {}).value; const sid = val('hScope') || null;
+    const reason = val('hReason').trim(), next = val('hNext').trim(), plan = val('hPlan').trim();
+    if (pick !== 'Healthy' && !reason) { toast('A reason is required for At Risk or Critical'); return; }
+    if (pick !== 'Healthy' && !next) { toast('A next action and owner are required'); return; }
+    if (pick === 'Critical' && !plan) { toast('Critical needs a recovery owner and plan'); return; }
+    sid_ = sid; pick_ = pick;
+    const scope = sid ? SVC[svcById(sid).type].name : 'Client';
+    const ts = nowStamp(); const due = val('hDue');
+    HH[o.id].unshift({ date: iso(TODAY), time: ts.time, at: ts.at, scope, sid, level: pick, by: who(), reason: reason || 'Reassessed with no concerns', next, owner: val('hOwner'), due, plan, recOwner: val('hRecOwner') });
+    if (sid) SVI[sid].health = { level: pick, on: iso(TODAY), at: ts.at, time: ts.time, reason, next, by: who(), plan, recOwner: val('hRecOwner'), due }; else { o.rating = pick; o.ratedOn = iso(TODAY); o.ratedAt = ts.at; o.ratedTime = ts.time; }
+    toast(pick === 'Critical' ? `Saved. ${escText('Critical', sid)}.` : pick === 'At Risk' ? `Saved. ${escText('At Risk', sid)}.` : 'Assessment saved');
+    if (m.sig) { const s = SIGNALS.find(x => x.id === m.sig); if (s && ACTIVE.includes(s.status) && s.status !== 'Actioned') { s.status = 'Actioned'; s.linked = 'Health reassessment'; log(s, `Client health reassessed as ${pick} by ${who()}`); } }
+  }
+  state.modal = (m.type === 'health' && sid_ && pick_ === 'Critical') ? { type: 'health', sid: null, notice: `${SVC[svcById(sid_).type].name} is now Critical. The overall client health must be assessed separately.` } : null; render();
+}
+
+/* ---------- signal catalogue: the risk signals this prototype detects ---------- */
+/* The PRD uses "risk" without defining it. Each category is named so it says what the risk is about at a glance. */
+const SIGTYPES = [
+  { cat: 'Exit intent', name: 'Intent to cancel', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: "We'd like to stop Paid Social at the end of this month." },
+  { cat: 'Exit intent', name: 'Cancellation request logged', kind: 'event', src: 'CRM', clears: 'A person acts on it or dismisses it', ex: 'Cancellation request CR-0087 awaiting COO approval' },
+  { cat: 'Exit intent', name: 'Notice-period or termination question', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'Could you send over the notice period for the Ads contract?' },
+  { cat: 'Exit intent', name: 'Contract-term question', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'When exactly does our contract end?' },
+  { cat: 'Exit intent', name: 'Access-transfer or data-export request', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'Please add our new partner as an owner on Search Console and GA4.' },
+  { cat: 'Contract expiry', name: 'Renewal within 90 days, no discussion logged', rule: 'Lead time is configurable (PRD 8.3.7)', kind: 'condition', src: 'CRM', clears: 'Clears itself when a renewal discussion is logged', ex: 'Renewal in 66 days, no renewal discussion logged' },
+  { cat: 'Spend cut', name: 'Budget cut mentioned', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'We may need to scale back marketing spend next year.' },
+  { cat: 'Spend cut', name: 'Scope reduction request', kind: 'event', src: 'Gmail or CRM', clears: 'A person acts on it or dismisses it', ex: 'Could we drop the TikTok ads from the package?' },
+  { cat: 'Spend cut', name: 'Suspension request', kind: 'event', src: 'CRM', clears: 'A person acts on it or dismisses it', ex: 'Suspension of Paid Social requested for 2 months' },
+  { cat: 'Competitor', name: 'Competitor mention', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'Another agency has offered a lower management fee.' },
+  { cat: 'Dissatisfaction', name: 'Formal complaint', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it; repeats count as one', ex: "The SEO report again doesn't show the keywords we agreed on." },
+  { cat: 'Dissatisfaction', name: 'Open or overdue complaint', kind: 'condition', src: 'CRM', clears: 'Clears itself when the issue is resolved', ex: 'Issue ISS-1042 is past its target date' },
+  { cat: 'Dissatisfaction', name: 'Questioning deliverables', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'Can you remind me what exactly we got for last month’s fee?' },
+  { cat: 'Delivery delay', name: 'Late commencement', kind: 'condition', src: 'CRM', clears: 'Clears itself when actual commencement is recorded', ex: 'Commencement 12 days later than planned' },
+  { cat: 'Delivery delay', name: 'Delayed milestone', kind: 'condition', src: 'CRM', clears: 'Clears itself when the milestone is complete', ex: 'Milestone "Q3 technical audit" 18 days late' },
+  { cat: 'Delivery delay', name: 'Onboarding stalled', kind: 'condition', src: 'CRM', clears: 'Clears itself when mandatory onboarding items are complete', ex: 'Onboarding incomplete 21 days after contract start' },
+  { cat: 'Contract expiry', name: 'Uncontracted delivery', kind: 'condition', src: 'CRM', clears: 'Clears itself when a renewal is endorsed or delivery stops', ex: 'Delivery continuing after the contract expired on 30/09/2026' },
+  { cat: 'Stakeholder change', name: 'New decision-maker', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'Please loop in our new Head of Marketing.' },
+  { cat: 'Stakeholder change', name: "Client's boss newly copied in", kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: "Client's director added to cc for the first time" },
+  { cat: 'Engagement drop', name: 'Reply-time slowdown', rule: "Measured against this client's own usual pattern", kind: 'trend', src: 'Gmail', clears: 'Fades unless it keeps happening', ex: 'Replies slowing: 6h → 2.5 days over 4 weeks' },
+  { cat: 'Engagement drop', name: 'Tone cooling', rule: "Measured against this client's own usual pattern", kind: 'trend', src: 'Gmail', clears: 'Fades unless it keeps happening', ex: 'Shorter replies; greetings dropped' },
+  { cat: 'Engagement drop', name: 'Fewer contacts engaging', rule: "Measured against this client's own usual pattern", kind: 'trend', src: 'Gmail', clears: 'Fades unless it keeps happening', ex: 'Contacts replying dropped from 3 to 1' },
+  { cat: 'Engagement drop', name: 'No reply to our email', kind: 'condition', src: 'Gmail', clears: 'Clears itself when the client replies', ex: 'No reply to our 08/10 report email after 7 days' },
+  { cat: 'Engagement drop', name: 'No AM contact for an extended period', kind: 'condition', src: 'CRM', clears: 'Clears itself when a client interaction is logged', ex: 'No AM contact logged in 41 days' },
+];
+const SIG_CATS = ['Exit intent', 'Contract expiry', 'Spend cut', 'Competitor', 'Dissatisfaction', 'Delivery delay', 'Stakeholder change', 'Engagement drop'];
+SIGTYPES.sort((a, b) => SIG_CATS.indexOf(a.cat) - SIG_CATS.indexOf(b.cat));
+const KIND_LABEL = { condition: 'Condition', event: 'Event', trend: 'Trend' };
+
+function viewCatalogue(o) {
+  const f = state.catFilter; const list = SIGTYPES.filter(t => (f.cat === 'all' || t.cat === f.cat) && (state.src === 'all' || /gmail/i.test(t.src)));
+  const chip = v => `<button class="chip" data-cf="cat:${v}" aria-pressed="${f.cat === v}">${v === 'all' ? 'All' : v}</button>`;
+  const srcChip = (v, l) => `<button class="chip" data-source="${v}" aria-pressed="${state.src === v}">${l}</button>`;
+  const rows = list.map(t => `<tr><td>${catTag(t.cat)}</td><td><b>${t.name}</b>${t.rule ? `<div class="hint">${t.rule}</div>` : ''}<div class="hint" style="font-style:italic">e.g. “${esc(t.ex)}”</div></td>
+        <td>${KIND_LABEL[t.kind]}<div class="hint">${t.clears}</div></td><td>${t.src}</td></tr>`).join('');
+  return `<div style="padding:4px 24px 14px;display:grid;gap:10px">
+      <div class="hint"><b>${list.length}</b> of <b>${SIGTYPES.length}</b> risk signal types shown, in <b>${SIG_CATS.length}</b> categories. Each category names what the risk is about, so a signal can be read at a glance.</div>
+      <div class="row"><span class="eyebrow">Category</span><div class="chips">${chip('all')}${SIG_CATS.map(chip).join('')}</div></div>
+      <div class="row"><span class="eyebrow">Source</span><div class="chips">${srcChip('all', 'All sources')}${srcChip('gmail', 'Gmail only')}</div></div>
+      ${anno('<b>Open decision:</b> the PRD refers to risks without defining them. This list is a starting point to confirm with the business, including which signals count as risks and how they are named.')}</div>
+    ${tbl([['Category'], ['Signal'], ['Type and how it clears'], ['Source']], rows, state.src === 'gmail' ? 'No Gmail-sourced signal types match this filter.' : 'No signal types match this filter.', 'cat-tbl')}
+    <div class="hint" style="padding:12px 24px 18px">Condition signals clear themselves when the underlying record changes. Event signals need a person to act or dismiss them. Trends are measured against each client's own usual pattern.</div>`;
+}
+
+/* ---------- email sentiment heat map (mock data standing in for an AI read of Gmail) ---------- */
+const GMAIL_FROM = '2025-08-04';              // when the mailbox was connected; earlier weeks have no email data
+const MIN_EMAILS = 1;                         // one email is enough to read a tone; a week with none is shown as "No emails"
+const USUAL_HRS = 6;                          // this client usually replies in about 6 hours
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const TONE_LABEL = { positive: 'Positive', neutral: 'Neutral', negative: 'Negative' };
+const toneTag = t => `<span class="stone ${t}">${TONE_LABEL[t]}</span>`;
+const TONE_SCORE = { positive: 1, neutral: 0, negative: -1 };
+const inRange = (d, a, b) => d >= a && d <= b;
+const fmtH = h => h.toFixed(1);
+const hrsTxt = h => h < 48 ? `${fmtH(h)} hours` : `${fmtH(h)} hours (${(h / 24).toFixed(1)} days)`;
+
+/* hand-written detail for notable weeks; every other week gets a generic line.
+   emails = emails FROM the client (tone is read from these only).
+   resp = emails WE sent that needed a reply, how many got none, and the median client reply time */
+const SENT_NOTES = {
+  '2026-10-13': { tone: 'negative', emails: 4, resp: { sent: 2, unanswered: 0, medHrs: 60.2 }, summary: 'A repeated reporting complaint and a notice-period question about Google Ads.',
+    quotes: [{ quote: "The SEO report again doesn't show the keywords we agreed on.", from: 'Daphne Lee', date: '2026-10-13', note: 'Repeated complaint, first raised 29/09/2026', sig: 'SG-1202' },
+             { quote: 'Ahead of our renewal in January, can you send the notice period for the Google Ads contract?', from: 'Daphne Lee', date: '2026-10-13', sig: 'SG-1201' }] },
+  '2026-10-03': { tone: 'positive', emails: 2, resp: { sent: 2, unanswered: 1, medHrs: 40.5 }, summary: 'Praise for the August report.',
+    quotes: [{ quote: 'Love the August report, the dashboard is much clearer.', from: 'Daphne Lee', date: '2026-10-03' }] },
+  '2026-09-29': { tone: 'negative', emails: 3, resp: { sent: 2, unanswered: 0, medHrs: 28.3 }, summary: 'The reporting complaint was first raised.',
+    quotes: [{ quote: "The SEO report again doesn't show the keywords we agreed on.", from: 'Daphne Lee', date: '2026-09-29', sig: 'SG-1202' }] },
+  '2026-09-20': { tone: 'neutral', emails: 2, resp: { sent: 1, unanswered: 0, medHrs: 12.4 } },
+  '2026-04-08': { tone: 'positive', emails: 5, summary: 'Appreciation after the technical audit findings.',
+    quotes: [{ quote: 'The audit findings are really useful, thank you.', from: 'Daphne Lee', date: '2026-04-08' }] },
+  '2025-12-10': { tone: 'negative', emails: 4, summary: 'Concern about a late monthly report.',
+    quotes: [{ quote: 'The November report arrived after our review meeting. Can we agree a fixed delivery date?', from: 'Daphne Lee', date: '2025-12-10' }] }
+};
+
+const SENTW = (() => {
+  const o = orgById('abc'); const N = Math.ceil((TODAY - D(DET[o.id].since)) / (7 * 864e5));
+  const r = rng(hash('sent' + o.id)); const weeks = [];
+  for (let i = 0; i < N; i++) {
+    const end = new Date(TODAY.getTime() - (N - 1 - i) * 7 * 864e5), start = new Date(end.getTime() - 6 * 864e5);
+    const w = { start: iso(start), end: iso(end), k: N - 1 - i, sent: 0, unanswered: 0, medHrs: null };
+    const note = Object.entries(SENT_NOTES).find(([d]) => inRange(d, w.start, w.end));
+    if (iso(end) < GMAIL_FROM) { w.state = 'before'; w.emails = 0; weeks.push(w); continue; }
+    const ym = end.getFullYear() * 100 + end.getMonth() + 1;
+    let emails = 1 + Math.floor(r() * 6); if (r() < .1) emails = 0;
+    if ((ym === 202512 || ym === 202601) && r() < .4) emails = 0;
+    const [pp, pn] = ym <= 202511 ? [.2, .1] : ym === 202512 ? [.05, .55] : ym <= 202602 ? [.2, .15] : ym <= 202604 ? [.55, .05] : [.25, .1];
+    const x = r(); let tone = x < pn ? 'negative' : x < pn + pp ? 'positive' : 'neutral';
+    let sent = Math.floor(r() * 3), unanswered = sent && r() < .06 ? 1 : 0;
+    let medHrs = sent - unanswered > 0 ? Math.round(USUAL_HRS * (.5 + r() * 1.5) * 10) / 10 : null; if (sent && r() < .05) medHrs = Math.round((30 + r() * 30) * 10) / 10;
+    if (note) { tone = note[1].tone; emails = note[1].emails; w.note = note[1]; if (note[1].resp) ({ sent, unanswered, medHrs } = note[1].resp); }
+    emails = Math.max(emails, sent - unanswered);   // a reply is itself an email from the client
+    Object.assign(w, { emails, sent, unanswered, medHrs, contacts: 1 + Math.floor(r() * 3) });
+    w.state = emails >= MIN_EMAILS ? 'ok' : 'low';
+    if (w.state === 'ok') w.tone = tone;
+    weeks.push(w);
+  }
+  // two weeks where the client wrote nothing: one quiet week, and one where we emailed and heard nothing back
+  [['2026-06-10', 0, 0], ['2026-08-12', 1, 1]].forEach(([d, sent, unanswered]) => { const w = weeks.find(x => inRange(d, x.start, x.end)); Object.assign(w, { emails: 0, state: 'low', tone: undefined, note: undefined, sent, unanswered, medHrs: null }); });
+  return weeks;
+})();
+
+function aggTone(ws) {
+  if (ws.every(w => w.state === 'before')) return { state: 'before', emails: 0, sent: 0, unanswered: 0, medHrs: null };
+  const ok = ws.filter(w => w.state === 'ok'); const emails = ws.reduce((a, w) => a + w.emails, 0);
+  const sent = ws.reduce((a, w) => a + w.sent, 0), unanswered = ws.reduce((a, w) => a + w.unanswered, 0);
+  const meds = ws.filter(w => w.medHrs !== null), medHrs = meds.length ? Math.round(meds.reduce((a, w) => a + w.medHrs, 0) / meds.length * 10) / 10 : null;
+  const base = { emails, sent, unanswered, medHrs };
+  if (!ok.length) return Object.assign({ state: 'low' }, base);
+  const sc = ok.reduce((a, w) => a + TONE_SCORE[w.tone] * w.emails, 0) / ok.reduce((a, w) => a + w.emails, 0);
+  return Object.assign({ state: 'ok', tone: sc > .25 ? 'positive' : sc < -.25 ? 'negative' : 'neutral' }, base);
+}
+const SENTM = (() => {
+  const by = {}; SENTW.forEach(w => { const d = new Date(D(w.start).getTime() + 3 * 864e5); const key = d.getFullYear() + '-' + pad(d.getMonth() + 1); (by[key] = by[key] || { key, y: d.getFullYear(), m: d.getMonth(), weeks: [] }).weeks.push(w); });
+  return Object.values(by).map(m => Object.assign(m, aggTone(m.weeks), { start: m.weeks[0].start, end: m.weeks[m.weeks.length - 1].end }));
+})();
+const WK_TEXT = { positive: n => `Appreciative tone across ${n} client email${n === 1 ? '' : 's'}.`, neutral: () => 'Routine messages with no clear tone either way.', negative: n => `Concern or frustration came through (${n} client email${n === 1 ? '' : 's'} read).` };
+
+const REPLY_SCALE = [[0, [254, 243, 199]], [.5, [251, 191, 36]], [1, [234, 88, 12]]];   // fastest pale cream -> amber -> slowest deep orange: darker means slower
+const scaleCss = t => { t = Math.max(0, Math.min(1, t)); const k = t <= .5 ? 0 : 1, [t0, c0] = REPLY_SCALE[k], [t1, c1] = REPLY_SCALE[k + 1], u = (t - t0) / (t1 - t0); return 'rgb(' + c0.map((v, n) => Math.round(v + (c1[n] - v) * u)).join(',') + ')'; };
+const replyState = c => c.state === 'before' ? 'before' : !c.sent ? 'none' : c.unanswered > 0 ? 'noreply' : c.medHrs === null ? 'none' : 'speed';
+const sentCells = () => state.sentGran === 'week' ? SENTW.slice(-26) : SENTM.slice(-12);
+const respDomain = () => { const v = sentCells().filter(c => replyState(c) === 'speed').map(c => c.medHrs); return v.length ? [Math.min(...v), Math.max(...v)] : [0, 1]; };
+const respColor = (h, dom = respDomain()) => scaleCss(dom[1] === dom[0] ? 0 : (h - dom[0]) / (dom[1] - dom[0]));
+
+function sentPanel(o, g, key) {
+  const cell = g === 'week' ? SENTW.find(w => w.start === key) : SENTM.find(m => m.key === key);
+  const label = g === 'week' ? `Week of ${fmtShort(cell.start)} – ${fmt(cell.end)}` : `${MON[cell.m]} ${cell.y}`;
+  const head = `<div class="row"><b>${label}</b>${cell.state === 'ok' ? toneTag(cell.tone) : ''}<span class="hint">${cell.emails} client email${cell.emails === 1 ? '' : 's'}</span></div>`;
+  if (cell.state === 'before') return `${head}<p class="sent-sum">Gmail was not connected yet (connected ${fmt(GMAIL_FROM)}), so there is no email data for this period.</p>`;
+  if (cell.state === 'low') return `${head}<p class="sent-sum">The client sent no emails in this period, so there is no tone to read. A quiet inbox is not the same as a calm client.</p>`;
+  const notes = g === 'week' ? (cell.note ? [cell.note] : []) : cell.weeks.filter(w => w.note).map(w => w.note);
+  const quotes = notes.flatMap(n => (n.quotes || []).map(q => Object.assign({ tone: n.tone }, q)));
+  const link = x => x.sig ? ` · <button class="btn ghost sm" style="padding:0" data-open-sig="${x.sig}">View signal</button>` : '';
+  const summary = notes.length ? notes.map(n => n.summary).filter(Boolean).join(' ') : WK_TEXT[cell.tone](cell.emails);
+  const byWeek = g === 'month' ? `<div class="hint">By week: ${cell.weeks.filter(w => w.state !== 'before').map(w => `${fmtShort(w.start)} ${w.state === 'ok' ? TONE_LABEL[w.tone].toLowerCase() : 'no emails'}`).join(' · ')}</div>` : '';
+  const ev = quotes.length ? `<div class=\"eyebrow\">Conversations behind this rating</div><ul class=\"evlist\">${quotes.map(x => `<li class="${x.tone}"><blockquote class="evq">“${esc(x.quote)}”</blockquote><div class="meta">${esc(x.from)} · Gmail · ${fmt(x.date)}${x.note ? ' · ' + esc(x.note) : ''}${link(x)}</div></li>`).join('')}</ul>` : (cell.tone === 'neutral' ? '' : '<div class="hint">No quotes were captured for this period.</div>');
+  return `${head}<p class="sent-sum">${esc(summary)}</p>${byWeek}${ev}`;
+}
+
+function sentimentCard(o) {
+  const g = state.sentGran; const WEEKS_SHOWN = 26, MONTHS_SHOWN = 12; const cells = g === 'week' ? SENTW.slice(-WEEKS_SHOWN) : SENTM.slice(-MONTHS_SHOWN); const keyOf = c => g === 'week' ? c.start : c.key;
+  const sel = cells.find(c => keyOf(c) === state.sentSel) || cells[cells.length - 1];
+  const toneOf = c => c.state === 'ok' ? c.tone : c.state;
+  const dom = respDomain();
+  const title = (c, row) => `${g === 'week' ? fmtShort(c.start) + ' – ' + fmtShort(c.end) : MON[c.m] + ' ' + c.y} · ` + (row === 'tone'
+    ? `${c.state === 'ok' ? TONE_LABEL[c.tone] : c.state === 'low' ? 'No emails from the client' : 'Gmail not connected'} · ${c.emails} client email${c.emails === 1 ? '' : 's'}`
+    : (t => t === 'speed' ? `Median reply time ${fmtH(c.medHrs)} hours` : t === 'noreply' ? `No reply to ${c.unanswered} of our emails${c.medHrs !== null ? ' · the others were answered in a median ' + fmtH(c.medHrs) + ' hours' : ''}` : t === 'before' ? 'Gmail not connected' : 'No emails from us needing a reply')(replyState(c)));
+  const btn = row => c => {
+    let cls, style = '', txt = '';
+    if (row === 'tone') { cls = toneOf(c); txt = g === 'month' ? MON[c.m] : ''; }
+    else { const t = replyState(c); if (t === 'speed') { cls = 'r-val'; style = ` style="background:${respColor(c.medHrs, dom)}"`; txt = fmtH(c.medHrs); } else { cls = 'r-' + t; txt = t === 'noreply' ? '✕' : ''; } }
+    return `<button class="hm ${g === 'month' ? 'm' : ''} ${cls}"${style} data-cell="${keyOf(c)}" aria-pressed="${keyOf(c) === keyOf(sel)}" aria-label="${esc(title(c, row))}" title="${esc(title(c, row))}">${txt}</button>`; };
+  const mid = c => g === 'week' ? new Date(D(c.start).getTime() + 3 * 864e5) : new Date(c.y, c.m, 1);
+  const runs = []; cells.forEach((c, i) => { const d = mid(c), key = g === 'week' ? d.getFullYear() * 12 + d.getMonth() : d.getFullYear(); const last = runs[runs.length - 1]; if (last && last.key === key) last.len++; else runs.push({ key, at: i, len: 1, d }); });
+  const runLabel = r => g === 'week' ? MON[r.d.getMonth()] + (r.len >= 3 && (r.d.getMonth() === 0 || r === runs[0]) ? ' ' + r.d.getFullYear() : '') : String(r.d.getFullYear());
+  const labels = `<div class="hmgrid hmlabels" style="grid-template-columns:repeat(${cells.length},minmax(0,1fr))">${runs.map(r => `<span class="hmmon" style="grid-column:${r.at + 1} / span ${r.len}">${runLabel(r)}</span>`).join('')}</div>`;
+  const grid = row => `<div class="hmgrid" style="grid-template-columns:repeat(${cells.length},minmax(0,1fr))">${cells.map(btn(row)).join('')}</div>`;
+  const range = g === 'week' ? `Latest ${cells.length} weeks, ${fmt(cells[0].start)} to ${fmt(cells[cells.length - 1].end)}` : `Latest ${cells.length} months, ${MON[cells[0].m]} ${cells[0].y} to ${MON[cells[cells.length - 1].m]} ${cells[cells.length - 1].y}`;
+  const chips = [['week', 'Weekly'], ['month', 'Monthly']].map(([v, l]) => `<button class="chip" data-gran="${v}" aria-pressed="${g === v}">${l}</button>`).join('');
+  return `<section class="section sent"><header><h2>Email sentiment</h2><div class="spacer"></div><div class="chips">${chips}</div></header>
+    <div class="sent-body">
+      <div class="hm-wrap"><div class="hint">${range}</div>
+        <div class="hmtable"><span></span>${labels}<span class="hmrowlab">Tone<small>what the client wrote</small></span>${grid('tone')}<span class="hmrowlab">Response speed<small>median hours to answer us</small></span>${grid('reply')}</div>
+        <div class="hmlegend"><span class="hmlg"><b>Tone</b><span class="lgnote">from emails the client sent</span><span><i class="sw positive"></i>Positive</span><span><i class="sw neutral"></i>Neutral</span><span><i class="sw negative"></i>Negative</span><span><i class="sw low"></i>No emails</span></span>
+          <span class="hmlg"><b>Response speed</b><span class="lgnote">median hours to answer our emails</span>${cells.some(c => replyState(c) === 'speed') ? `<span class="gradlg"><span>${fmtH(dom[0])} h fastest</span><i class="gradbar" style="background:linear-gradient(90deg,${[0, .25, .5, .75, 1].map(scaleCss).join(',')})"></i><span>${fmtH(dom[1])} h slowest</span></span>` : ''}<span><i class="sw r-noreply"></i>No reply</span><span><i class="sw r-none"></i>No emails</span></span>
+          ${cells.some(c => c.state === 'before') ? '<span class="hmlg"><span><i class="sw before"></i>Gmail not connected (both rows)</span></span>' : ''}</div></div>
+      <div class="sentpanel">${sentPanel(o, g, keyOf(sel))}</div>
+      <div class="hint">AI-assessed from email text and reply times, so calls and other channels are not included. It prompts a reassessment and never changes a health rating. Select a ${g === 'week' ? 'week' : 'month'} to see what is behind it.</div></div></section>`;
+}
+
+function viewRisk(o) {
+  const sigs = orgSignals(o.id);
+  const active = sigs.filter(isActive).sort(sortSig);
+  const hist = sigs.filter(s => !ACTIVE.includes(s.status)).sort(sortSig);
+  const sigRow = s => `<button class="sig ${s.status === 'Dismissed' || s.status === 'Resolved' ? 'muted' : ''}" data-open-sig="${s.id}">
+      <span class="sevcell">${catTag(s.cat)}</span>
+      <span class="what"><span class="t">${esc(s.title)}</span><br><span class="c">${esc(svcName(s.service))}${s.kind === 'condition' ? ' · ongoing' : ''}${s.reinforced > 1 ? ` · repeated ×${s.reinforced}` : ''}</span></span>
+      <span class="meta"><span class="src">${esc(s.source)} · ${s.kind === 'event' ? fmt(s.date) : 'since ' + fmt(s.date)}</span><span class="status ${s.status}">${s.status}</span></span>
+      ${s.quote ? `<span class="q">“${esc(s.quote)}”</span>` : s.detail ? `<span class="q" style="font-style:normal">${esc(s.detail)}</span>` : ''}
+    </button>`;
+  const ref = (key, title, inner) => `<details class="section ref" data-ref="${key}" ${state.open[key] ? 'open' : ''}><summary>${title}</summary>${inner}</details>`;
+  return `${healthCard(o)}${sentimentCard(o)}<section class="section">
+      <header><h2>Risk signals</h2><span class="hint num">${active.length} active</span></header>
+      ${active.length ? active.map(sigRow).join('') : '<div class="empty">No active risk signals.</div>'}
+    </section>
+    ${hist.length ? ref('hist', `Dismissed and resolved <span class="num hint">(${hist.length})</span>`, hist.map(sigRow).join('')) : ''}
+    ${ref('types', `Signal types <span class="hint">· ${SIGTYPES.length} · reference only</span>`, viewCatalogue(o))}`;
+}
+
+/* ---------- drawer ---------- */
+function renderDrawer() {
+  const ov = document.getElementById('overlay');
+  if (!state.drawer) { ov.innerHTML = ''; return; }
+  const s = SIGNALS.find(x => x.id === state.drawer); const o = orgById(s.org);
+  const sv = s.service && svcById(s.service);
+  const closed = !ACTIVE.includes(s.status);
+  let foot = '';
+  if (closed) foot = `<span class="hint">This signal is ${s.status.toLowerCase()}.</span><div class="row"><button class="btn sm" data-reopen="${s.id}">Reopen</button></div>`;
+  else if (state.mode === 'dismiss') {
+    foot = `<label for="dismissReason" class="eyebrow">Reason for dismissing (required)</label><textarea id="dismissReason" placeholder="e.g. Client confirmed on a call that this is resolved"></textarea>
+      <div class="hint">Dismissed signals and reasons stay visible to the HOD.</div>
+      <div class="row"><button class="btn primary sm" data-dismiss-confirm>Dismiss signal</button><button class="btn sm" data-mode="">Cancel</button></div>`;
+  } else {
+    const canDismiss = s.kind !== 'condition';
+    const acts = s.kind === 'trend'
+      ? [['checkin', 'Schedule a check-in call', 'Creates a task for the AM this week'], ['reassess', 'Reassess health', canEditHealth(o) ? 'Update the Client Health rating' : 'Ask the AM to reassess']]
+      : [['issue', 'Create Issue', 'Tracked complaint with an owner (PRD 8.3.5)'], ['reassess', 'Reassess health', canEditHealth(o) ? 'Update the Client Health rating' : 'Ask the AM to reassess'], ...(s.cat === 'Exit intent' ? [['cancel', 'Log cancellation request', 'Routes to COO for approval']] : [])];
+    foot = `<div class="eyebrow">Suggested actions</div><div class="actmenu">${acts.map(([k, t, d]) => `<button data-act="${k}"><b>${t}</b><span>${d}</span></button>`).join('')}</div>
+      <div class="row">        ${canDismiss ? '<button class="btn" data-mode="dismiss">Dismiss…</button>' : '<button class="btn" disabled title="Condition signals clear themselves">Dismiss</button>'}</div>
+`;
+  }
+  ov.innerHTML = `<div class="scrim" data-close></div>
+  <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+    <header><div><div class="row">${catTag(s.cat)}<span class="src mono">${s.id}</span><span class="status ${s.status}">${s.status}</span></div><h2 id="dTitle">${esc(s.title)}</h2>
+      <div class="hint">${esc(o.name)} · ${esc(svcName(s.service))}</div></div><button class="x" data-close aria-label="Close">✕</button></header>
+    <div class="scroll">
+      ${s.quote ? `<div><div class="eyebrow" style="margin-bottom:6px">Evidence</div><blockquote>“${esc(s.quote)}”<footer>${esc(s.source)} · ${fmt(s.date)}</footer></blockquote></div>`
+      : s.detail ? `<div><div class="eyebrow" style="margin-bottom:6px">What changed</div><p style="margin:0">${esc(s.detail)}</p></div>` : ''}
+      <div><div class="eyebrow" style="margin-bottom:6px">Attributed to</div>
+        <dl class="kv"><dt>Organisation</dt><dd>${esc(o.name)}</dd>
+        <dt>Service</dt><dd>${esc(svcName(s.service))}</dd>
+        ${sv ? `<dt>Contract</dt><dd class="mono">${sv.contract} · ends ${fmt(sv.end)}</dd><dt>Annual value</dt><dd class="num">${money(sv.value)}</dd><dt>PE</dt><dd>${esc(sv.pe)}</dd>` : ''}
+        <dt>AM / rating</dt><dd>${esc(o.am)} · ${esc(o.rating)} (${fmt(o.ratedOn)})</dd>
+        ${s.linked ? `<dt>Linked to</dt><dd>${esc(s.linked)}</dd>` : ''}
+        ${s.dismissReason ? `<dt>Dismissed because</dt><dd>${esc(s.dismissReason)}</dd>` : ''}</dl></div>
+      <div><div class="eyebrow" style="margin-bottom:6px">Signal history</div><ul class="hist">${(s.history.length ? s.history : [{ d: s.date, t: 'Detected' }]).map(h => `<li><span class="when">${fmt(h.d)}</span><span>${esc(h.t)}</span></li>`).join('')}</ul></div>
+    </div>
+    <div class="foot">${foot}</div>
+  </aside>`;
+}
+
+/* ---------- actions ---------- */
+let toastTimer;
+function toast(msg) {
+  const h = document.getElementById('toastHost'); h.innerHTML = `<div class="toast" role="status">${esc(msg)}</div>`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => h.innerHTML = '', 3200);
+}
+const who = () => ME;
+const log = (s, t) => s.history.push({ d: iso(TODAY), t });
+function openSig(id, orgId) {
+  const s = SIGNALS.find(x => x.id === id); if (!s) return;
+  state.org = orgId || s.org; state.page = 'risk'; state.drawer = id; state.mode = null;
+  render();
+}
+function nextId(p) { return p + '-' + (1043 + Math.floor(Math.random() * 900)); }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('button, [data-open-org], [data-close], [data-open-sig]'); if (!t) return;
+  const d = t.dataset;
+  if (d.page) { state.page = d.page; render(); return; }
+  if (d.modal) { state.modal = { type: d.modal, sid: d.sid || null }; renderModal(); return; }
+  if ('modalClose' in d) { state.modal = null; renderModal(); return; }
+  if ('modalSave' in d) { saveModal(); return; }
+  if (d.openSig) { openSig(d.openSig, d.org); return; }
+  if ('close' in d) { state.drawer = null; state.mode = null; render(); return; }
+  if (d.gran) { state.sentGran = d.gran; state.sentSel = null; render(); return; }
+  if (d.cell) { state.sentSel = d.cell; render(); return; }
+  if (d.source) { state.src = d.source; render(); return; }
+  if (d.cf) { const [g, v] = d.cf.split(':'); state.catFilter[g] = v; render(); return; }
+  if ('mode' in d) { state.mode = d.mode || null; renderDrawer(); return; }
+  const s = state.drawer && SIGNALS.find(x => x.id === state.drawer);
+  if (d.act && s) {
+    const o = orgById(s.org);
+    if (d.act === 'reassess') {
+      if (canEditHealth(o)) { state.drawer = null; state.mode = null; state.modal = { type: 'health', sig: s.id }; render(); return; }
+      log(s, `${who()} asked ${o.am} to reassess Client Health`); s.status = 'Actioned'; s.linked = `Reassessment task for ${o.am}`;
+      toast(`Task sent to ${o.am} to reassess health`); state.mode = null; render(); return;
+    }
+    if (d.act === 'issue') { state.modal = { type: 'issue', sig: s.id }; renderModal(); return; }
+    const map = { issue: ['ISS', 'Issue', 'created'], cancel: ['CR', 'Cancellation request', 'logged; awaiting COO approval'], checkin: ['TSK', 'Check-in call task', 'created for this week'] };
+    const [p, n, v] = map[d.act]; const id = nextId(p);
+    s.status = 'Actioned'; s.linked = `${n} ${id}`; log(s, `${n} ${id} ${v} by ${who()}`);
+    toast(`${n} ${id} ${v}`); state.mode = null; render(); return;
+  }
+  if ('dismissConfirm' in d && s) {
+    const r = document.getElementById('dismissReason').value.trim();
+    if (!r) { toast('Add a reason before dismissing'); document.getElementById('dismissReason').focus(); return; }
+    s.status = 'Dismissed'; s.dismissReason = r; log(s, `Dismissed by ${who()}: "${r}"`);
+    toast('Signal dismissed. Reason visible to HOD.'); state.mode = null; state.drawer = null; render(); return;
+  }
+  if (d.reopen) { const x = SIGNALS.find(y => y.id === d.reopen); x.status = 'New'; x.dismissReason = null; log(x, 'Reopened by ' + who()); toast('Signal reopened'); render(); return; }
+});
+document.addEventListener('change', e => {
+  if (e.target.name === 'hr') document.querySelectorAll('.modal [data-for]').forEach(x => { const f = x.dataset.for; x.hidden = !(f === 'Critical' ? e.target.value === 'Critical' : e.target.value !== 'Healthy'); });
+});
+document.addEventListener('toggle', e => { const k = e.target.dataset && e.target.dataset.ref; if (k) state.open[k] = e.target.open; }, true);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && state.modal) { state.modal = null; renderModal(); return; }
+  if (e.key === 'Escape' && state.drawer) { state.drawer = null; state.mode = null; render(); } });
+
+state.org = 'abc';
+render();
+</script>
+
+</body></html>
