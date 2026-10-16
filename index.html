@@ -360,6 +360,7 @@ details.ref[open] > summary{border-bottom:1px solid var(--line)}
 .evq{margin:0;padding:0;background:none;border:0;font-size:14px;font-style:italic;border-radius:0}
 .evlist .meta{font-size:12px;color:var(--fg-3);margin-top:2px}
 @media (max-width:640px){.sent-body{padding-inline:16px}}
+#risk-signals{scroll-margin-top:16px}
 /* overlays stay fully opaque (Hub rule) */
 .drawer,.modal .panel{background:#fff;backdrop-filter:none}
 .drawer{border-radius:24px 0 0 24px}
@@ -675,7 +676,7 @@ const isLive = sv => ['Active', 'Ready to Commence', 'Pending Onboarding', 'Susp
 const overdueTasks = id => orgTasks(id).filter(t => !t.done && D(t.due) < TODAY);
 
 /* ---------- state ---------- */
-const state = { org: 'abc', catFilter: { cat: 'all' }, src: 'all', sentGran: 'week', sentSel: null, page: 'overview', modal: null, open: { health: false, hist: false, types: false }, drawer: null, mode: null };
+const state = { org: 'abc', catFilter: { cat: 'all' }, src: 'all', sentGran: 'week', sentSel: null, page: 'risk', scrollTo: null, modal: null, open: { health: false, hist: false, types: false }, drawer: null, mode: null };
 const canEditHealth = () => true;
 
 /* ---------- small renderers ---------- */
@@ -687,6 +688,7 @@ const anno = html => `<div class="anno">${html}</div>`;
 function render() {
   document.getElementById('app').innerHTML = viewAccount();
   renderDrawer(); renderModal();
+  if (state.scrollTo) { const el = document.getElementById(state.scrollTo); state.scrollTo = null; if (el) el.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }
 }
 /* ---------- client record: shell and tabs ---------- */
 const PAGES = [['overview', 'Overview'], ['services', 'Services & contracts'], ['contacts', 'Contacts'], ['activity', 'Activity'], ['issues', 'Issues'], ['opps', 'Opportunities'], ['billing', 'Billing'], ['risk', 'Health & risk']];
@@ -696,7 +698,7 @@ const hBadge = l => `<span class="rating r-${l.replace(' ', '')}">${esc(l)}</spa
 const stTag = s => `<span class="tag st-${s.split(' ')[0].toLowerCase()}">${esc(s)}</span>`;
 const tbl = (head, rows, empty, cls) => `<div class="tbl-wrap"><table class="${cls || ''}"><thead><tr>${head.map(h => `<th class="${h[1] || ''}">${h[0]}</th>`).join('')}</tr></thead><tbody>${rows || `<tr><td colspan="${head.length}" class="empty">${empty}</td></tr>`}</tbody></table></div>`;
 const sec = (title, body, right = '') => `<section class="section"><header><h2>${title}</h2><div class="spacer"></div>${right}</header>${body}</section>`;
-const goBtn = (page, label) => !ENABLED.includes(page) ? '' : `<button class="btn ghost sm" data-page="${page}">${label}</button>`;
+const goBtn = (page, label) => !ENABLED.includes(page) ? '' : `<button class="btn ghost sm" data-page="${page}"${page === 'risk' ? ' data-scroll="risk-signals"' : ''}>${label}</button>`;
 const svcLabel = id => id ? esc(svcName(id)) : 'Account-wide';
 const daysTo = e => daysBetween(TODAY, D(e));
 const endCell = e => { const n = daysTo(e); return `<span class="num">${fmt(e)}</span>${n < 0 ? ' <span class="pill lvl-severe">Ended</span>' : n <= 90 ? ` <span class="hint">(${n} days)</span>` : ''}`; };
@@ -747,7 +749,7 @@ function pgOverview(o) {
   const con = CON[o.id].slice(0, 3);
   const inv = orgInv(o.id); const openOpps = orgOpps(o.id);
   return `<div class="cols"><div>
-    ${sec('Risk signals', sigs.length ? sigs.slice(0, 3).map(s => `<button class="sigmini" data-open-sig="${s.id}">${catTag(s.cat)}<span><b>${esc(s.title)}</b> <span class="hint">· ${svcLabel(s.service)}</span></span><span class="src">${esc(s.source)} · ${fmtShort(s.date)}</span></button>`).join('') : '<div class="empty">No active signals.</div>', goBtn('risk', 'Open risk signals'))}
+    ${sec('Risk signals', sigs.length ? sigs.slice(0, 3).map(s => `<button class="sigmini" data-page="risk" data-scroll="risk-signals">${catTag(s.cat)}<span><b>${esc(s.title)}</b> <span class="hint">· ${svcLabel(s.service)}</span></span><span class="src">${esc(s.source)} · ${fmtShort(s.date)}</span></button>`).join('') : '<div class="empty">No active signals.</div>', goBtn('risk', 'Open risk signals'))}
     ${S('Needs attention', attn)}
     ${S('Services', tbl([['Service'], ['Status'], ['PE'], ['Health'], ['Contract ends']], svcRows), goBtn('services', 'All services & contracts'))}
     ${S('Recent activity', `<ul class="tl">${acts.map(a => `<li><span class="when">${fmt(a.date)}</span><div>${esc(a.text)}<div class="meta">${a.type} · ${esc(a.by)}${a.internal ? ' · internal note' : ''}</div></div></li>`).join('')}</ul>`, goBtn('activity', 'All activity'))}
@@ -1030,7 +1032,7 @@ function viewRisk(o) {
       ${s.quote ? `<span class="q">“${esc(s.quote)}”</span>` : s.detail ? `<span class="q" style="font-style:normal">${esc(s.detail)}</span>` : ''}
     </button>`;
   const ref = (key, title, inner) => `<details class="section ref" data-ref="${key}" ${state.open[key] ? 'open' : ''}><summary>${title}</summary>${inner}</details>`;
-  return `${healthCard(o)}${sentimentCard(o)}<section class="section">
+  return `${healthCard(o)}${sentimentCard(o)}<section class="section" id="risk-signals">
       <header><h2>Risk signals</h2><span class="hint num">${active.length} active</span></header>
       ${active.length ? active.map(sigRow).join('') : '<div class="empty">No active risk signals.</div>'}
     </section>
@@ -1098,7 +1100,7 @@ function nextId(p) { return p + '-' + (1043 + Math.floor(Math.random() * 900)); 
 document.addEventListener('click', e => {
   const t = e.target.closest('button, [data-open-org], [data-close], [data-open-sig]'); if (!t) return;
   const d = t.dataset;
-  if (d.page) { state.page = d.page; render(); return; }
+  if (d.page) { state.page = d.page; state.scrollTo = d.scroll || null; render(); return; }
   if (d.modal) { state.modal = { type: d.modal, sid: d.sid || null }; renderModal(); return; }
   if ('modalClose' in d) { state.modal = null; renderModal(); return; }
   if ('modalSave' in d) { saveModal(); return; }
