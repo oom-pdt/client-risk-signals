@@ -14,7 +14,7 @@
   --sev-pos:#059669; --sev-pos-bg:#d1fae5;
   --band:rgba(99,102,241,.14); --ours:#94a3b8;
   --anno-bg:#fff7d6; --anno-fg:#5c4a00; --anno-line:#e5cf6b;
-  --glass:rgba(255,255,255,.62); --glass-line:rgba(255,255,255,.75);
+  --glass:rgba(255,255,255,.9); --glass-line:rgba(255,255,255,.75);
   --shadow:0 12px 40px rgba(15,23,42,.14);
   --font-ui:system-ui,-apple-system,"Segoe UI",sans-serif;
   --font-data:system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -67,15 +67,6 @@ main{padding-block:20px 60px}
 /* service strip */
 
 /* signal rows */
-.sig{display:grid;grid-template-columns:172px minmax(0,1fr) auto;gap:4px 14px;padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left}
-.sig:hover{background:var(--surface-2)}
-.sig:last-child{border-bottom:0}
-.sig .what{min-width:0}
-.sig .what .t{font-weight:600}
-.sig .what .c{font-size:12px;color:var(--fg-3)}
-.sig .q{grid-column:2/4;font-size:13px;color:var(--fg-2);border-left:2px solid var(--line-strong);padding-left:10px;font-style:italic;min-width:0}
-.sig .meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-.sig.muted{opacity:.6}
 .empty{padding:24px 16px;color:var(--fg-3);text-align:center}
 
 /* tables */
@@ -153,10 +144,6 @@ textarea{width:100%;min-height:72px;border:1px solid var(--line-strong);border-r
 .facts{display:flex;flex-wrap:wrap;gap:10px 32px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .fact .l{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-3);font-weight:600}
 .fact .v{font-size:14px;font-weight:600}
-.pagetabs{display:flex;gap:2px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:16px}
-.pagetabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 12px 9px;color:var(--fg-2);font-weight:500;display:flex;gap:6px;align-items:center}
-.pagetabs button[aria-selected="true"]{border-bottom-color:var(--accent);color:var(--fg)}
-.pagetabs .ct{font-family:var(--font-data);font-size:11px;background:var(--surface-2);border-radius:999px;padding:0 6px;color:var(--fg-2)}
 .tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;border:1px solid var(--line-strong);color:var(--fg-2);white-space:nowrap}
 .tag.st-active,.tag.ok{border-color:var(--sev-pos);color:var(--sev-pos)}
 .tag.st-expired,.tag.bad{border-color:var(--sev-severe);color:var(--sev-severe)}
@@ -175,7 +162,8 @@ textarea{width:100%;min-height:72px;border:1px solid var(--line-strong);border-r
 .tl .when{font-family:var(--font-data);font-size:12px;color:var(--fg-3)}
 .tl .meta{font-size:12px;color:var(--fg-3);margin-top:2px}
 .sigmini{display:grid;grid-template-columns:172px minmax(0,1fr) auto;gap:10px;align-items:baseline;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 16px}
-.sigmini:hover{background:var(--surface-2)}
+.sigmini:hover{background:rgba(99,102,241,.05)}
+.sigmini{padding-left:24px;padding-right:24px}
 .sigmini:last-child{border-bottom:0}
 .contract-head{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:baseline;padding:12px 16px;background:var(--surface-2);border-bottom:1px solid var(--line)}
 .modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px}
@@ -199,9 +187,6 @@ textarea{width:100%;min-height:72px;border:1px solid var(--line-strong);border-r
 .unattr:last-child{border-bottom:0}
 
 @media (max-width:640px){
-  .sig{grid-template-columns:minmax(0,1fr) auto}
-  .sig .sevcell{grid-column:1/3}
-  .sig .q{grid-column:1/3}
   .unattr{grid-template-columns:minmax(0,1fr)}
   .actmenu{grid-template-columns:1fr}
   .brief > div{border-right:0;border-bottom:1px solid var(--line)}
@@ -213,7 +198,7 @@ textarea{width:100%;min-height:72px;border:1px solid var(--line-strong);border-r
 }
 
 /* ---- Hub-style skin: soft gradient, frosted cards, pill controls (visual reference: Hub-V1) ---- */
-body{background-color:#f8fafc;background-image:radial-gradient(circle at 15% 10%,#e0e7ff 0%,transparent 40%),radial-gradient(circle at 85% 30%,#f3e8ff 0%,transparent 45%),radial-gradient(circle at 50% 90%,#fae8ff 0%,transparent 50%);background-attachment:fixed;min-height:100vh;font-size:13px}
+body{background-color:#f8fafc;background-image:radial-gradient(circle at 15% 10%,#e0e7ff 0%,transparent 40%),radial-gradient(circle at 85% 30%,#f3e8ff 0%,transparent 45%),radial-gradient(circle at 50% 90%,#fae8ff 0%,transparent 50%);background-attachment:fixed;min-height:100vh;font-size:14px}
 .num{font-family:var(--font-ui);font-size:1em;font-variant-numeric:tabular-nums}
 .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.9em}
 select{border-radius:12px;background:#fff;border:1px solid var(--line)}
@@ -229,11 +214,6 @@ main{padding-block:28px 72px}
 .fact .l,.eyebrow{font-weight:700;letter-spacing:.5px}
 .contract-head{background:rgba(99,102,241,.06);border-bottom:0;padding:14px 24px}
 /* segmented pill tabs */
-.pagetabs{display:inline-flex;flex-wrap:wrap;gap:2px;padding:4px;margin:0 0 20px;background:rgba(255,255,255,.6);border:1px solid var(--glass-line);border-radius:999px}
-.pagetabs button{border:0;border-radius:999px;padding:8px 16px;color:var(--fg-3);font-weight:600;background:none}
-.pagetabs button[aria-selected="true"]{background:var(--accent);color:#fff;border:0}
-.pagetabs button[aria-selected="true"] .ct{background:rgba(255,255,255,.25);color:#fff}
-.pagetabs .ct{background:rgba(99,102,241,.12);color:var(--accent-ink)}
 .chip{border-radius:999px}
 /* buttons */
 .btn{border-radius:12px;border:1px solid var(--line-strong);background:#fff;font-weight:600;padding:8px 16px}
@@ -259,9 +239,6 @@ tbody tr:hover td{background:rgba(255,255,255,.55)}
 .rating.r-Critical{background:var(--sev-severe-bg);border-color:#fecaca;color:var(--sev-severe)}
 .gap{border-radius:999px}
 /* rows */
-.sig,.sigmini{padding-left:24px;padding-right:24px}
-.sig:hover,.sigmini:hover{background:rgba(255,255,255,.6)}
-.sig .q{border-left-color:rgba(99,102,241,.35)}
 .attn li,.list li,.tl li,.empty{padding-left:24px;padding-right:24px}
 .legend{background:rgba(99,102,241,.05);padding-left:24px;padding-right:24px}
 .tile{padding:18px 22px}.tile .v{font-size:28px;font-weight:700}
@@ -276,9 +253,6 @@ tbody tr:hover td{background:rgba(255,255,255,.55)}
 .dm.fact{display:block;margin:0}
 .dm.fact > .dm-body{filter:blur(5px)}
 .dm.fact > .dm-tag{display:none}
-.pagetabs button:disabled{opacity:.4;cursor:not-allowed}
-.scopebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:rgba(99,102,241,.08);border:1px dashed rgba(99,102,241,.35);border-radius:16px;padding:10px 16px;margin-bottom:16px;font-size:12.5px;color:var(--fg-2)}
-.scopebar b{color:var(--accent-ink)}
 tr.grp td{background:rgba(99,102,241,.07);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--accent-ink);padding:8px 24px}
 tbody tr.grp:hover td{background:rgba(99,102,241,.07)}
 .cat-tbl{min-width:900px}.cat-tbl td{vertical-align:top}
@@ -290,15 +264,32 @@ details.ref[open] > summary::after{content:"▾"}
 details.ref[open] > summary{border-bottom:1px solid var(--line)}
 .hc{padding:0}
 .hc-top{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:24px 24px 18px}
-.hc-rate{display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap}
+.hc-rate{display:flex;align-items:center;gap:18px;margin-top:8px;flex-wrap:wrap}
 .rating.lg{font-size:15px;padding:6px 18px}
 .hc-alert{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin:0 24px 20px;background:var(--anno-bg);border:1px solid var(--anno-line);border-radius:14px;padding:10px 16px;font-size:13px;color:var(--anno-fg)}
 .hc-svc{border-top:1px solid var(--line)}
-.hrow{display:grid;grid-template-columns:minmax(0,1fr) 110px 110px 110px 92px;gap:12px;align-items:center;padding:12px 24px;border-top:1px solid rgba(15,23,42,.05)}
-.hrow:first-child{border-top:0}
-.hrow.head{padding-block:10px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--fg-3);background:rgba(99,102,241,.04)}
-.hname{display:flex;flex-direction:column;min-width:0}
-.hact{display:flex;justify-content:flex-end}
+.h-tbl{table-layout:fixed;min-width:1100px}
+.h-tbl th,.h-tbl td{padding-left:12px;padding-right:12px}
+.h-tbl th:first-child,.h-tbl td:first-child{padding-left:24px}
+.h-tbl th:last-child,.h-tbl th:nth-child(1){width:14%}.h-tbl th:nth-child(2){width:9%}.h-tbl th:nth-child(3){width:18%}.h-tbl th:nth-child(4){width:19%}.h-tbl th:nth-child(5){width:11%}.h-tbl th:nth-child(6){width:9%}.h-tbl th:nth-child(7){width:10%}.h-tbl th:nth-child(8){width:10%}
+.h-tbl .rating,.h-tbl .rel{white-space:nowrap}
+.h-tbl td{vertical-align:middle;line-height:1.45;padding-top:14px;padding-bottom:14px}
+.h-tbl td.svc{font-weight:700}
+.h-tbl td:last-child{padding-right:20px}
+.two-line{display:flex;flex-direction:column;gap:2px}
+.rel{font-size:12px;color:var(--fg-3)}
+.rel.late{color:var(--sev-severe);font-weight:700}
+.rel.today{color:#b45309;font-weight:700}
+.muted{color:var(--fg-3)}
+.hc-meta{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 22px;font-size:13px}
+.hc-meta small{display:block;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--fg-3)}
+.hh li{grid-template-columns:110px minmax(0,1fr);padding-block:16px}
+.hh .when{font-size:13px;color:var(--fg-2)}
+.hh .when small{display:block;font-size:12px;color:var(--fg-3)}
+.hhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hkv{display:grid;grid-template-columns:112px minmax(0,1fr);gap:6px 16px;margin:10px 0 0;font-size:13.5px}
+.hkv dt{font-size:12px;font-weight:700;color:var(--fg-3);padding-top:1px}
+.hkv dd{margin:0}
 .hc-foot{padding:12px 24px 18px;border-top:1px solid rgba(15,23,42,.05)}
 .hc-hist{border-top:1px solid var(--line)}
 .hc-hist > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 24px;font-weight:700;font-size:13px}
@@ -306,7 +297,6 @@ details.ref[open] > summary{border-bottom:1px solid var(--line)}
 .hc-hist > summary::after{content:"▸";margin-left:auto;color:var(--fg-3)}
 .hc-hist[open] > summary::after{content:"▾"}
 .hc-hist .tl li:first-child{border-top:1px solid rgba(15,23,42,.05)}
-@media (max-width:640px){.hrow{grid-template-columns:minmax(0,1fr) auto}.hrow > :nth-child(3),.hrow > :nth-child(4){display:none}}
 .cattag{display:inline-block;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);border:1px solid rgba(99,102,241,.25);white-space:nowrap}
 /* category colours: tinted pill + darker text; the label always carries the meaning */
 .cattag[data-c="exit-intent"]{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
@@ -339,28 +329,93 @@ details.ref[open] > summary{border-bottom:1px solid var(--line)}
 .hm:hover{filter:brightness(.95)}
 .hmtable{display:grid;grid-template-columns:118px minmax(0,1fr);gap:6px 12px;align-items:center}
 .hmrowlab{font-size:13px;font-weight:700;color:var(--fg)}
-.hmrowlab small{display:block;font-size:11px;font-weight:500;color:var(--fg-3)}
 .hm.r-none,.sw.r-none{background:#fff;border:1px dashed #94a3b8}
 .hm.r-val{color:#1e293b}
 .hm.r-noreply,.sw.r-noreply{background:#334155;color:#fff;font-size:12px}
 .stone.r-noreply{background:#334155;color:#fff;border-color:#334155}
 .stone.r-speed{color:#1e293b;border-color:rgba(15,23,42,.14)}
-.gradlg{display:inline-flex;align-items:center;gap:6px;font-size:12px}
+.gradlg{display:inline-flex;align-items:center;gap:8px;font-size:12px}
 .gradbar{display:inline-block;width:120px;height:12px;border-radius:6px;border:1px solid rgba(15,23,42,.1)}
 .hm.r-before{background:repeating-linear-gradient(45deg,#f1f5f9,#f1f5f9 4px,#e2e8f0 4px,#e2e8f0 8px);border-color:#e2e8f0}
-.lgnote{font-size:11px;color:var(--fg-3);font-style:italic}
-.hmlg{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-right:22px}
-.hmlegend{display:flex;flex-wrap:wrap;gap:8px 8px;font-size:12px;color:var(--fg-2);margin-top:6px}
+.hmlg{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
+.hmlg + .hmlg{margin-left:40px;padding-left:40px;border-left:1px solid var(--line-strong)}
+.hmlg > b{font-size:12px;font-weight:700;color:var(--fg);margin-right:2px}
+.hmlegend{display:flex;flex-wrap:wrap;align-items:center;gap:10px 0;font-size:12px;color:var(--fg-2);margin-bottom:6px;padding:14px 20px;background:rgba(15,23,42,.04);border-radius:14px}
 .hmlegend span{display:inline-flex;align-items:center}
-.sw{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:6px;border:1px solid transparent}
+.sw{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;border:1px solid transparent;flex:none}
 .sentpanel{border:1px solid var(--line);border-radius:16px;padding:16px 18px;background:rgba(255,255,255,.7);display:grid;gap:10px;align-content:start;min-width:0}
+.toneblk{display:grid;gap:8px}
 .evlist{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .evlist li{border-left:3px solid var(--line-strong);padding-left:12px}
 .evlist li.negative{border-left-color:#f87171}.evlist li.positive{border-left-color:#34d399}
 .evq{margin:0;padding:0;background:none;border:0;font-size:14px;font-style:italic;border-radius:0}
 .evlist .meta{font-size:12px;color:var(--fg-3);margin-top:2px}
 @media (max-width:640px){.sent-body{padding-inline:16px}}
-#risk-signals{scroll-margin-top:16px}
+/* ---- readability baseline ---- */
+.hint{font-size:13px}
+th{font-size:11.5px}
+td{font-size:14px}
+.section{margin-bottom:24px}
+.section > header h2{font-size:18px}
+.eyebrow{font-size:11.5px}
+.btn,.chip,.hm{transition:background .15s,border-color .15s,transform .12s,filter .15s}
+.hm:hover{transform:translateY(-1px)}
+/* ---- risk signal rows: obviously clickable, status as a pill ---- */
+.sig{display:grid;grid-template-columns:156px minmax(0,1fr) auto 20px;gap:6px 16px;align-items:start;padding:16px 24px;border:0;border-bottom:1px solid var(--line);background:none;width:100%;text-align:left;cursor:pointer;transition:background .15s}
+.sig:hover{background:rgba(99,102,241,.05)}
+.sig:last-child{border-bottom:0}
+.sig .what{min-width:0;display:flex;flex-direction:column;gap:2px}
+.sig .what .t{font-weight:700;font-size:15px;line-height:1.35}
+.sig .what .c{font-size:13px;color:var(--fg-3)}
+.sig .q{grid-column:2/4;font-size:13.5px;color:var(--fg-2);border-left:3px solid rgba(99,102,241,.3);padding-left:12px;font-style:italic;min-width:0;margin-top:4px;line-height:1.5}
+.sig .meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.sig .chev{grid-row:1;grid-column:4;align-self:center;font-size:24px;line-height:1;color:var(--line-strong);transition:transform .15s,color .15s}
+.sig:hover .chev{color:var(--accent);transform:translateX(2px)}
+.sig.muted{opacity:.62}
+.stpill{font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;background:#f1f5f9;color:#475569;white-space:nowrap}
+.sig .what{position:relative}
+.newdot{position:absolute;left:-14px;top:8px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.sr{position:absolute;left:-9999px}
+.stpill.Actioned{background:var(--sev-pos-bg);color:var(--sev-pos)}
+/* ---- in-page navigation for the long tab ---- */
+#sec-health,#sec-sentiment,#risk-signals{scroll-margin-top:64px}
+/* ---- primary navigation: a plain underlined tab bar ---- */
+.pagetabs{display:flex;gap:2px;margin:0 0 20px;border-bottom:1px solid var(--line-strong);overflow-x:auto;scrollbar-width:none}
+.pagetabs button{flex:none;white-space:nowrap;display:flex;align-items:center;gap:8px;background:none;border:0;border-bottom:3px solid transparent;border-radius:0;margin-bottom:-1px;padding:12px 18px;font-size:14px;font-weight:600;color:var(--fg-2);transition:color .15s,background .15s}
+.pagetabs button:hover:not(:disabled){color:var(--fg);background:rgba(99,102,241,.06)}
+.pagetabs button[aria-selected="true"]{color:var(--accent-ink);border-bottom-color:var(--accent)}
+.pagetabs button:disabled{color:#94a3b8;font-weight:500;cursor:not-allowed}
+.pagetabs .ct{font-size:11.5px;font-weight:700;background:rgba(99,102,241,.14);color:var(--accent-ink);border-radius:999px;padding:1px 8px}
+/* ---- secondary navigation: small jump chips, clearly different from the tabs above ---- */
+.secnav{position:sticky;top:8px;z-index:15;display:flex;gap:8px;align-items:center;padding:8px 14px;margin:0 0 20px;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 24px rgba(15,23,42,.08)}
+.secnav::before{content:"Jump to";font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--fg-3);margin-right:4px}
+.secnav button{display:flex;gap:8px;align-items:center;border:1px solid var(--line-strong);background:#fff;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--fg-2);transition:background .15s,border-color .15s,color .15s}
+.secnav button:hover{border-color:var(--accent);color:var(--accent-ink)}
+.secnav button[aria-current="true"]{background:var(--accent-soft);border-color:rgba(99,102,241,.45);color:var(--accent-ink)}
+.secnav .ct{font-size:11.5px;background:rgba(99,102,241,.16);color:var(--accent-ink);border-radius:999px;padding:0 7px}
+@media (max-width:760px){
+  .sig{grid-template-columns:minmax(0,1fr) auto 18px;padding:14px 16px}
+  .sig .sevcell{grid-column:1/-1}
+  .sig .what{grid-column:1}
+  .sig .meta{grid-column:2;align-items:flex-end}
+  .sig .chev{grid-column:3}
+  .sig .q{grid-column:1/-1}
+  .pagetabs button{padding:12px 14px}
+  .secnav{overflow-x:auto;scrollbar-width:none}
+  .secnav::before{display:none}
+  .secnav button{white-space:nowrap;flex:none}
+}
+/* heat map scrolls sideways instead of squashing its cells; the row action stays reachable */
+.hm-scroll{overflow-x:auto;padding:4px 4px 8px;margin:-4px -4px 0}
+.hmtable{min-width:calc(130px + var(--n,26) * 36px)}
+@media (max-width:1180px){
+  .h-tbl td:last-child,.h-tbl th:last-child{position:sticky;right:0;background:rgba(255,255,255,.97);box-shadow:-10px 0 12px -10px rgba(15,23,42,.18)}
+}
+@media (max-width:1000px){
+  .hmlegend{flex-direction:column;align-items:flex-start;gap:10px}
+  .hmlg + .hmlg{margin-left:0;padding-left:0;border-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 /* overlays stay fully opaque (Hub rule) */
 .drawer,.modal .panel{background:#fff;backdrop-filter:none}
 .drawer{border-radius:24px 0 0 24px}
@@ -482,7 +537,7 @@ let SIGNALS = [
   // XYZ
   S({ id: 'SG-1195', org: 'xyz', service: 'xyz-seo', cat: 'Exit intent', kind: 'event', source: 'Gmail', date: '2026-10-10',
       title: 'Requested admin transfer for Search Console and GA4', quote: "Please add our new partner's email as an owner on Search Console and GA4 by Friday.",
-      history: [{ d: '2026-10-10', t: 'Detected' }, { d: '2026-10-10', t: 'HOD notified (Severe)' }] }),
+      history: [{ d: '2026-10-10', t: 'Detected' }, { d: '2026-10-10', t: 'HOD notified' }] }),
   S({ id: 'SG-1191', org: 'xyz', service: null, cat: 'Stakeholder change', kind: 'event', source: 'Gmail', date: '2026-10-08',
       title: "Client's director newly copied in", quote: '(Director added to cc on the monthly report thread for the first time)' }),
   // DEF
@@ -513,7 +568,7 @@ let SIGNALS = [
   // Orchid
   S({ id: 'SG-1184', org: 'orw', service: 'orw-psoc', cat: 'Exit intent', kind: 'event', source: 'Gmail', date: '2026-10-07', status: 'Actioned',
       title: 'Intent to cancel', quote: "We'd like to stop Paid Social at the end of this month.", linked: 'Cancellation request CR-0087 (awaiting COO approval)',
-      history: [{ d: '2026-10-07', t: 'Detected; HOD notified' }, { d: '2026-10-08', t: 'Cancellation request CR-0087 logged by Priya Nair' }, { d: '2026-10-08', t: 'Client Health set to Critical by Priya Nair' }] }),
+      history: [{ d: '2026-10-07', t: 'Detected; HOD notified' }, { d: '2026-10-08', t: 'Cancellation request CR-0087 logged by Priya Nair' }, { d: '2026-10-08', t: 'Client health set to Critical by Priya Nair' }] }),
   // Lumen
   S({ id: 'SG-1170', org: 'lum', service: 'lum-psoc', cat: 'Spend cut', kind: 'event', source: 'Gmail', date: '2026-10-02',
       title: 'Asked to reduce scope', quote: 'Could we drop the TikTok ads from the package from next month?' }),
@@ -543,7 +598,7 @@ const sortSig = (a, b) => D(b.date) - D(a.date);
 function rng(seed) { let s = seed % 2147483647; if (s <= 0) s += 2147483646; return () => (s = s * 16807 % 2147483647, (s - 1) / 2147483646); }
 const hash = str => [...str].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
 
-/* ---------- client record data (all fictional; see PRD 3.3 and 8.3) ---------- */
+/* ---------- client record data (all fictional) ---------- */
 const HOD = { SEO: 'Daniel Ong', 'Paid Media': 'Tricia Lau', Web: 'Tricia Lau' };
 const RENEWAL_STATES = ['Not Started', 'Follow-Up Required', 'Discussion Ongoing', 'Pending Commercial Agreement', 'Pending Endorsement', 'Renewed', 'Not Renewing', 'Expired Without Renewal'];
 const ISSUE_STATUSES = ['Open', 'Investigating', 'Action in Progress', 'Pending Client', 'Resolved', 'Closed'];
@@ -625,7 +680,7 @@ ORGS.filter(o => !o.prospect).forEach(o => {
   }
 });
 
-/* issues (PRD 8.3.5) and opportunities (PRD 5.2) */
+/* issues and opportunities */
 const ISSUES = [
   { id: 'ISS-1042', org: 'mdg', svc: 'mdg-seo', title: 'Rankings dropped off page one', cat: 'Delivery quality', sev: 'High', owner: 'Hafiz Rahman', status: 'Action in Progress', reported: '2026-09-24', target: '2026-10-20', sig: 'SG-1158' },
   { id: 'ISS-0981', org: 'mdg', svc: 'mdg-seo', title: 'Monthly report delivered late', cat: 'Reporting', sev: 'Medium', owner: 'Hafiz Rahman', status: 'Closed', reported: '2026-05-04', target: '2026-05-20', closed: '2026-07-20' }
@@ -636,7 +691,7 @@ const OPPS = [
   { id: 'OPP-2098', org: 'hbl', name: 'Website Development renewal', stage: 'Consideration / Negotiation', est: 12000, owner: 'Priya Nair (AM)', created: '2026-09-20' }
 ];
 
-/* billing: QBB is authoritative for invoices and payment status (PRD 3.3.7) */
+/* billing: QBB is authoritative for invoices and payment status */
 const INV = []; const SCHED = [];
 (() => {
   let n = 24700;
@@ -655,7 +710,7 @@ const INV = []; const SCHED = [];
   set('sec', x => x.issued === '2026-08-01', { no: 'INV-24790', amount: 5500, due: '2026-09-05', status: 'Overdue', note: 'Payment promise missed on 09/10/2026.' });
 })();
 
-/* health history (PRD 8.3.4): newest first, never overwritten */
+/* health history: newest first, never overwritten */
 const HH = {};
 const AM_HOD = 'Grace Teo', COO = 'Rachel Lee';
 const escText = (level, sid) => { if (level === 'Healthy') return ''; const hod = sid ? `${HOD[SVC[svcById(sid).type].line]} (Service HOD)` : `${AM_HOD} (AM HOD)`; return level === 'Critical' ? `Escalated to ${hod} and ${COO} (COO)` : `Visible to ${hod}`; };
@@ -681,20 +736,31 @@ const canEditHealth = () => true;
 
 /* ---------- small renderers ---------- */
 const catTag = c => `<span class="cattag" data-c="${slug(c)}">${esc(c)}</span>`;
-const ratingBadge = o => `<span class="rating r-${o.rating.replace(' ', '')}">AM rating: ${esc(o.rating)}</span>`;
+const ratingBadge = o => `<span class="rating r-${o.rating.replace(' ', '')}">AM rating: ${esc(hl(o.rating))}</span>`;
 const anno = html => `<div class="anno">${html}</div>`;
 
 /* ---------- views ---------- */
+const SPY_IDS = ['sec-health', 'sec-sentiment', 'risk-signals'];
+function updateSpy() {
+  const nav = document.querySelector('.secnav'); if (!nav) return;
+  let cur = SPY_IDS[0];
+  SPY_IDS.forEach(id => { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top <= 150) cur = id; });
+  nav.querySelectorAll('button').forEach(b => b.setAttribute('aria-current', String(b.dataset.jump === cur)));
+}
+let spyQueued = false;
+addEventListener('scroll', () => { if (spyQueued) return; spyQueued = true; setTimeout(() => { spyQueued = false; updateSpy(); }, 60); }, { passive: true });
 function render() {
   document.getElementById('app').innerHTML = viewAccount();
   renderDrawer(); renderModal();
+  updateSpy();
   if (state.scrollTo) { const el = document.getElementById(state.scrollTo); state.scrollTo = null; if (el) el.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); }
 }
 /* ---------- client record: shell and tabs ---------- */
 const PAGES = [['overview', 'Overview'], ['services', 'Services & contracts'], ['contacts', 'Contacts'], ['activity', 'Activity'], ['issues', 'Issues'], ['opps', 'Opportunities'], ['billing', 'Billing'], ['risk', 'Health & risk']];
 const ENABLED = ['overview', 'risk'];
-const dm = (html, cls = '') => `<div class="dm ${cls}"><span class="dm-tag">Dummy data · not in scope</span><div class="dm-body" inert aria-hidden="true">${html}</div></div>`;
-const hBadge = l => `<span class="rating r-${l.replace(' ', '')}">${esc(l)}</span>`;
+const dm = (html, cls = '') => `<div class="dm ${cls}"><span class="dm-tag">Dummy data · Not in scope</span><div class="dm-body" inert aria-hidden="true">${html}</div></div>`;
+const hl = l => l === 'At Risk' ? 'At risk' : l;
+const hBadge = l => `<span class="rating r-${l.replace(' ', '')}">${esc(hl(l))}</span>`;
 const stTag = s => `<span class="tag st-${s.split(' ')[0].toLowerCase()}">${esc(s)}</span>`;
 const tbl = (head, rows, empty, cls) => `<div class="tbl-wrap"><table class="${cls || ''}"><thead><tr>${head.map(h => `<th class="${h[1] || ''}">${h[0]}</th>`).join('')}</tr></thead><tbody>${rows || `<tr><td colspan="${head.length}" class="empty">${empty}</td></tr>`}</tbody></table></div>`;
 const sec = (title, body, right = '') => `<section class="section"><header><h2>${title}</h2><div class="spacer"></div>${right}</header>${body}</section>`;
@@ -713,29 +779,24 @@ function attention(o) {
   const od = orgInv(o.id).filter(x => x.status === 'Overdue'); if (od.length) out.push({ text: `${od.length} overdue invoice${od.length === 1 ? '' : 's'} (${money(od.reduce((a, x) => a + x.amount, 0))})`, page: 'billing', go: 'Open' });
   const iss = orgIssues(o.id).filter(i => isOpenIssue(i) && i.target && D(i.target) < TODAY); if (iss.length) out.push({ text: `${iss.length} issue${iss.length === 1 ? '' : 's'} past target date`, page: 'issues', go: 'Open' });
   const ot = overdueTasks(o.id); if (ot.length) out.push({ text: `${ot.length} overdue follow-up${ot.length === 1 ? '' : 's'}: ${ot[0].text}`, page: 'activity', go: 'Open' });
-  if (differs(o)) out.push({ text: `${sigs.length} active risk signal${sigs.length === 1 ? '' : 's'} but the client is rated Healthy. Consider a reassessment.`, page: 'risk', go: 'Open' });
+  if (differs(o)) out.push({ text: `${sigs.length} active risk signal${sigs.length === 1 ? '' : 's'} but the client is rated Healthy.`, page: 'risk', go: 'Open' });
   return out;
 }
 
 function viewAccount() {
   const o = orgById(state.org); const d = DET[o.id];
-  const live = o.services.filter(isLive); const annual = live.filter(s => !SVI[s.id].status.startsWith('Expired')).reduce((a, s) => a + s.value, 0);
+  const live = o.services.filter(isLive);
   const nextEnd = live.map(s => s.end).filter(e => D(e) >= TODAY).sort()[0];
   const sigs = activeSigs(o);
-  const openIss = orgIssues(o.id).filter(isOpenIssue).length; const openFu = orgTasks(o.id).filter(t => !t.done).length;
   const tabs = PAGES.map(([k, l]) => `<button role="tab" data-page="${k}" aria-selected="${state.page === k}" ${ENABLED.includes(k) ? '' : 'disabled title="Not part of this prototype"'}>${l}${k === 'risk' && sigs.length ? `<span class="ct">${sigs.length}</span>` : ''}</button>`).join('');
   const body = { overview: pgOverview, risk: viewRisk }[state.page](o);
   return `<div class="idcard"><div class="top"><div><h1>${esc(o.name)}</h1>
-      <div class="sub"><span class="tag ${live.length ? 'ok' : ''}">${live.length ? 'Active client' : 'Former client'}</span><span>Trading as ${esc(d.trading)}</span><span>UEN <span class="mono">${d.uen}</span></span><span>Client health ${hBadge(o.rating)} <span class="hint">assessed ${fmt(o.ratedOn)}</span></span></div></div>
+      <div class="sub"><span class="tag ${live.length ? 'ok' : ''}">${live.length ? 'Active client' : 'Former client'}</span><span>Trading as ${esc(d.trading)}</span><span>UEN <span class="mono">${d.uen}</span></span><span>Client health ${hBadge(o.rating)}</span></div></div>
       <div class="spacer"></div>
       <div class="row"><button class="btn" data-modal="activity">Log activity</button><button class="btn" data-modal="issue">Create issue</button></div></div>
     <div class="facts"><div class="fact"><div class="l">Primary AM</div><div class="v">${esc(o.am)}</div></div>
-      <div class="dm fact"><div class="dm-body"><div class="fact"><div class="l">Active services</div><div class="v">${live.length}</div></div></div></div>
-      <div class="dm fact"><div class="dm-body"><div class="fact"><div class="l">Annual contract value</div><div class="v num">${money(annual)}</div></div></div></div>
-      <div class="fact"><div class="l">Next contract end</div><div class="v num">${nextEnd ? fmt(nextEnd) : '—'}</div></div>
-      <div class="dm fact"><div class="dm-body"><div class="fact"><div class="l">Client since</div><div class="v num">${fmt(d.since)}</div></div></div></div>
-      <div class="dm fact"><div class="dm-body"><div class="fact"><div class="l">Open issues</div><div class="v num">${openIss}</div></div></div></div></div></div>
-    <div class="scopebar"><b>Prototype focus: risk signals.</b> All data is fictional. Blurred sections are placeholders with dummy data, and greyed-out tabs are not part of this prototype.</div><div class="pagetabs" role="tablist">${tabs}</div>${body}`;
+      <div class="fact"><div class="l">Next contract end</div><div class="v num">${nextEnd ? fmt(nextEnd) : '—'}</div></div></div></div>
+    <div class="pagetabs" role="tablist">${tabs}</div>${body}`;
 }
 
 function pgOverview(o) {
@@ -752,7 +813,7 @@ function pgOverview(o) {
     ${sec('Risk signals', sigs.length ? sigs.slice(0, 3).map(s => `<button class="sigmini" data-page="risk" data-scroll="risk-signals">${catTag(s.cat)}<span><b>${esc(s.title)}</b> <span class="hint">· ${svcLabel(s.service)}</span></span><span class="src">${esc(s.source)} · ${fmtShort(s.date)}</span></button>`).join('') : '<div class="empty">No active signals.</div>', goBtn('risk', 'Open risk signals'))}
     ${S('Needs attention', attn)}
     ${S('Services', tbl([['Service'], ['Status'], ['PE'], ['Health'], ['Contract ends']], svcRows), goBtn('services', 'All services & contracts'))}
-    ${S('Recent activity', `<ul class="tl">${acts.map(a => `<li><span class="when">${fmt(a.date)}</span><div>${esc(a.text)}<div class="meta">${a.type} · ${esc(a.by)}${a.internal ? ' · internal note' : ''}</div></div></li>`).join('')}</ul>`, goBtn('activity', 'All activity'))}
+    ${S('Recent activity', `<ul class="tl">${acts.map(a => `<li><span class="when">${fmt(a.date)}</span><div>${esc(a.text)}<div class="meta">${a.type} · ${esc(a.by)}${a.internal ? ' · Internal note' : ''}</div></div></li>`).join('')}</ul>`, goBtn('activity', 'All activity'))}
   </div><aside>
     ${S('Follow-ups', fu.length ? `<ul class="list">${fu.map(t => `<li><span>${esc(t.text)}<div class="sub2">${esc(t.owner)}</div></span><span class="num ${D(t.due) < TODAY ? 'bad' : ''}" style="${D(t.due) < TODAY ? 'color:var(--sev-severe)' : ''}">${fmtShort(t.due)}${D(t.due) < TODAY ? ' overdue' : ''}</span></li>`).join('')}</ul>` : '<div class="empty">No open follow-ups.</div>')}
     ${S('Account team', `<ul class="list"><li><span>${esc(o.am)}<div class="sub2">Primary AM</div></span></li>${[...new Map(o.services.map(s => [s.pe + SVC[s.type].name, s])).values()].map(s => `<li><span>${esc(s.pe)}<div class="sub2">PE · ${SVC[s.type].name}</div></span></li>`).join('')}${[...new Set(o.services.map(s => HOD[SVC[s.type].line]))].map(h => `<li><span>${esc(h)}<div class="sub2">Service HOD</div></span></li>`).join('')}</ul>`)}
@@ -763,28 +824,39 @@ function pgOverview(o) {
 }
 
 const whenTxt = h => fmt(h.date || h.on) + (h.time ? ' ' + h.time : '');
-const dueTxt = d => d ? ` · due ${fmt(d)}${D(d) < TODAY ? ' <b style="color:var(--sev-severe)">overdue</b>' : ''}` : '';
+const dash = '<span class="muted">—</span>';
+const escWho = (level, sid) => { if (level === 'Healthy') return ''; const hod = sid ? `${HOD[SVC[svcById(sid).type].line]} (Service HOD)` : `${AM_HOD} (AM HOD)`; return level === 'Critical' ? `${hod} and ${COO} (COO)` : hod; };
+const escTo = level => level === 'Critical' ? 'HOD and COO' : level === 'At Risk' ? 'HOD' : '';
+const dueChip = d => { if (!d) return dash; const n = daysTo(d); return `<div class="two-line"><span class="num">${fmt(d)}</span><span class="rel ${n < 0 ? 'late' : n === 0 ? 'today' : ''}">${n < 0 ? `Overdue by ${-n} day${-n === 1 ? '' : 's'}` : n === 0 ? 'Due today' : `In ${n} day${n === 1 ? '' : 's'}`}</span></div>`; };
 function healthCard(o) {
-  const rows = o.services.map(sv => { const h = SVI[sv.id].health; const e = escText(h.level, sv.id);
-    return `<div class="hrow"><div class="hname"><b>${SVC[sv.type].name}</b>${h.reason ? `<span class="hint">${esc(h.reason)}</span>` : ''}${h.next ? `<span class="hint">Next: ${esc(h.next)}${dueTxt(h.due)}</span>` : ''}${e ? `<span class="hint">${esc(e)}</span>` : ''}</div>
-      <div>${hBadge(h.level)}</div><div class="num hint">${whenTxt(h)}</div><div class="hint">${esc(h.by)}</div>
-      <div class="hact"><button class="btn sm" data-modal="health" data-sid="${sv.id}" aria-label="Reassess ${SVC[sv.type].name}">Reassess</button></div></div>`; }).join('');
-  const ce = escText(o.rating, null);
-  return `<section class="section hc">
+  const rows = o.services.map(sv => { const h = SVI[sv.id].health; const e = escTo(h.level);
+    return `<tr><td class="svc">${SVC[sv.type].name}</td>
+      <td>${hBadge(h.level)}</td>
+      <td>${h.reason ? esc(h.reason) : dash}</td><td>${h.next ? esc(h.next) : dash}</td><td>${dueChip(h.due)}</td>
+      <td>${e ? `<span title="${esc(escText(h.level, sv.id))}">${e}</span>` : dash}</td>
+      <td><div class="two-line"><span class="num">${whenTxt(h)}</span><span class="rel">${esc(h.by)}</span></div></td>
+      <td class="r"><button class="btn sm" data-modal="health" data-sid="${sv.id}" aria-label="Reassess ${SVC[sv.type].name}">Reassess</button></td></tr>`; }).join('');
+  const ce = escTo(o.rating);
+  return `<section class="section hc" id="sec-health">
     <div class="hc-top"><div class="hc-main"><div class="eyebrow">Client health</div>
-        <div class="hc-rate"><span class="rating lg r-${o.rating.replace(' ', '')}">${esc(o.rating)}</span><span class="hint">Assessed ${fmt(o.ratedOn)}${o.ratedTime ? ' ' + o.ratedTime : ''} by ${esc(o.am)}${ce ? ' · ' + esc(ce) : ''}</span></div></div>
+        <div class="hc-rate"><span class="rating lg r-${o.rating.replace(' ', '')}">${esc(hl(o.rating))}</span>
+          <span class="hc-meta"><span><small>Last assessed</small>${fmt(o.ratedOn)}${o.ratedTime ? ' ' + o.ratedTime : ''}</span><span><small>Assessed by</small>${esc(o.am)}</span>${ce ? `<span title="${esc(escText(o.rating, null))}"><small>Escalated to</small>${o.rating === 'Critical' ? 'AM HOD and COO' : 'AM HOD'}</span>` : ''}</span></div></div>
       <button class="btn primary" data-modal="health">Reassess client health</button></div>
-    <div class="hc-svc"><div class="hrow head"><div>Services (${o.services.length})</div><div>Health</div><div>Last assessed</div><div>Assessed by</div><div></div></div>${rows}</div>
+    <div class="hc-svc">${tbl([['Service'], ['Health'], ['Reason'], ['Next action'], ['Due'], ['Escalated to'], ['Last assessed'], ['']], rows, '', 'h-tbl')}</div>
     <details class="hc-hist" data-ref="health" ${state.open.health ? 'open' : ''}><summary>Assessment history <span class="num hint">(${HH[o.id].length})</span></summary>${healthHistory(o)}</details>
     <div class="hint hc-foot">Signals prompt a reassessment; a person decides the rating. Client and service health are rated separately.</div></section>`;
 }
-const healthHistory = o => `<ul class="tl">${HH[o.id].map(h => { const e = escText(h.level, h.sid); return `<li><span class="when">${whenTxt(h)}</span><div>${hBadge(h.level)} <b>${esc(h.scope)}</b> by ${esc(h.by)}${h.reason ? `<div>${esc(h.reason)}</div>` : ''}${h.next ? `<div class="meta">Next action: ${esc(h.next)}${h.owner ? ' · owner ' + esc(h.owner) : ''}${dueTxt(h.due)}</div>` : ''}${h.plan ? `<div class="meta">Recovery plan: ${esc(h.plan)} · recovery owner ${esc(h.recOwner)}</div>` : ''}${e ? `<div class="meta">${esc(e)}</div>` : ''}</div></li>`; }).join('')}</ul>`;
+const healthHistory = o => `<ul class="tl hh">${HH[o.id].map(h => { const f = (k, v) => v ? `<dt>${k}</dt><dd>${v}</dd>` : '';
+  const due = h.due ? `<span class="num">${fmt(h.due)}</span>` : '';
+  return `<li><span class="when">${fmt(h.date || h.on)}${h.time ? `<small>${h.time}</small>` : ''}</span>
+    <div><div class="hhead">${hBadge(h.level)}<b>${esc(h.scope)}</b><span class="hint">Assessed by ${esc(h.by)}</span></div>
+      <dl class="hkv">${f('Reason', esc(h.reason))}${f('Next action', esc(h.next))}${f('Owner', esc(h.owner))}${f('Due', due)}${f('Recovery plan', esc(h.plan))}${f('Recovery owner', esc(h.recOwner))}${f(h.level === 'Critical' ? 'Escalated to' : 'Visible to', esc(escWho(h.level, h.sid)))}</dl></div></li>`; }).join('')}</ul>`;
 
 /* ---------- modals ---------- */
 const ownerOpts = o => peopleFor(o).map(p => `<option>${esc(p)}</option>`).join('');
 const svcOpts = (o, sel) => `<option value="">Account-wide</option>` + o.services.map(s => `<option value="${s.id}" ${s.id === sel ? 'selected' : ''}>${SVC[s.type].name}</option>`).join('');
 function renderModal() {
-  const h = document.getElementById('modalHost'); const m = state.modal; if (!m) { h.innerHTML = ''; return; }
+  const h = document.getElementById('modalHost'); const m = state.modal; if (!m) { h.innerHTML = ''; if (modalWasOpen) { modalWasOpen = false; const t = state.restoreModal && document.querySelector(state.restoreModal); if (t) t.focus({ preventScroll: true }); } return; }
   const o = orgById(state.org); const sig = m.sig && SIGNALS.find(x => x.id === m.sig);
   let title, fields, save;
   if (m.type === 'activity') {
@@ -807,15 +879,16 @@ function renderModal() {
     title = 'Reassess health'; save = 'Save assessment';
     const cur = m.sid ? SVI[m.sid].health.level : o.rating;
     fields = `${m.notice ? `<div class="hc-alert" style="margin:0"><b>⚠ Required</b><span>${esc(m.notice)}</span></div>` : ''}<label class="f">Scope<select id="hScope"><option value="">Client (overall relationship)</option>${o.services.map(s => `<option value="${s.id}" ${s.id === m.sid ? 'selected' : ''}>Service: ${SVC[s.type].name}</option>`).join('')}</select></label>
-      <div class="opts" role="radiogroup" aria-label="Health">${['Healthy', 'At Risk', 'Critical'].map(r => `<label class="toggle"><input type="radio" name="hr" value="${r}" ${cur === r ? 'checked' : ''}> ${r}</label>`).join('')}</div>
+      <div class="opts" role="radiogroup" aria-label="Health">${['Healthy', 'At Risk', 'Critical'].map(r => `<label class="toggle"><input type="radio" name="hr" value="${r}" ${cur === r ? 'checked' : ''}> ${hl(r)}</label>`).join('')}</div>
       <div data-for="At Risk Critical" ${['At Risk', 'Critical'].includes(cur) ? '' : 'hidden'} style="display:grid;gap:12px"><label class="f">Reason (required)<textarea id="hReason"></textarea></label>
         <div class="two"><label class="f">Next action (required)<input type="text" id="hNext"></label><label class="f">Owner<select id="hOwner">${ownerOpts(o)}</select></label></div>
         <label class="f">Next action due<input type="date" id="hDue" value="${dayAgo(-7)}"></label></div>
       <div data-for="Critical" ${cur === 'Critical' ? '' : 'hidden'} style="display:grid;gap:12px"><div class="two"><label class="f">Recovery owner (required)<select id="hRecOwner">${ownerOpts(o)}</select></label><label class="f">Recovery plan (required)<input type="text" id="hPlan"></label></div>
-        <div class="hint">Critical escalates immediately to the relevant HOD and the CEO/COO. At Risk is visible to the relevant HOD.</div></div>
+        <div class="hint">Critical escalates immediately to the relevant HOD and the CEO/COO. At risk is visible to the relevant HOD.</div></div>
       <div class="hint">Previous assessments are kept; this adds a new one.</div>`;
   }
   h.innerHTML = `<div class="modal"><div class="bg" data-modal-close></div><div class="panel" role="dialog" aria-modal="true" aria-labelledby="mTitle"><header><h2 id="mTitle">${title}</h2><button class="x btn sm" data-modal-close aria-label="Close">✕</button></header><div class="fields">${fields}</div><div class="pfoot"><button class="btn" data-modal-close>Cancel</button><button class="btn primary" data-modal-save>${save}</button></div></div></div>`;
+  if (!modalWasOpen) { modalWasOpen = true; const f = h.querySelector('.fields input:not([type=radio]),.fields textarea,.fields select'); if (f) f.focus({ preventScroll: true }); }
 }
 const val = id => (document.getElementById(id) || {}).value || '';
 function saveModal() {
@@ -834,7 +907,7 @@ function saveModal() {
   } else {
     const pick = (document.querySelector('input[name="hr"]:checked') || {}).value; const sid = val('hScope') || null;
     const reason = val('hReason').trim(), next = val('hNext').trim(), plan = val('hPlan').trim();
-    if (pick !== 'Healthy' && !reason) { toast('A reason is required for At Risk or Critical'); return; }
+    if (pick !== 'Healthy' && !reason) { toast('A reason is required for At risk or Critical'); return; }
     if (pick !== 'Healthy' && !next) { toast('A next action and owner are required'); return; }
     if (pick === 'Critical' && !plan) { toast('Critical needs a recovery owner and plan'); return; }
     sid_ = sid; pick_ = pick;
@@ -849,14 +922,14 @@ function saveModal() {
 }
 
 /* ---------- signal catalogue: the risk signals this prototype detects ---------- */
-/* The PRD uses "risk" without defining it. Each category is named so it says what the risk is about at a glance. */
+/* "Risk" is not formally defined yet. Each category is named so it says what the risk is about at a glance. */
 const SIGTYPES = [
   { cat: 'Exit intent', name: 'Intent to cancel', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: "We'd like to stop Paid Social at the end of this month." },
   { cat: 'Exit intent', name: 'Cancellation request logged', kind: 'event', src: 'CRM', clears: 'A person acts on it or dismisses it', ex: 'Cancellation request CR-0087 awaiting COO approval' },
   { cat: 'Exit intent', name: 'Notice-period or termination question', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'Could you send over the notice period for the Ads contract?' },
   { cat: 'Exit intent', name: 'Contract-term question', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'When exactly does our contract end?' },
   { cat: 'Exit intent', name: 'Access-transfer or data-export request', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'Please add our new partner as an owner on Search Console and GA4.' },
-  { cat: 'Contract expiry', name: 'Renewal within 90 days, no discussion logged', rule: 'Lead time is configurable (PRD 8.3.7)', kind: 'condition', src: 'CRM', clears: 'Clears itself when a renewal discussion is logged', ex: 'Renewal in 66 days, no renewal discussion logged' },
+  { cat: 'Contract expiry', name: 'Renewal within 90 days, no discussion logged', rule: 'Lead time can be configured', kind: 'condition', src: 'CRM', clears: 'Clears itself when a renewal discussion is logged', ex: 'Renewal in 66 days, no renewal discussion logged' },
   { cat: 'Spend cut', name: 'Budget cut mentioned', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'We may need to scale back marketing spend next year.' },
   { cat: 'Spend cut', name: 'Scope reduction request', kind: 'event', src: 'Gmail or CRM', clears: 'A person acts on it or dismisses it', ex: 'Could we drop the TikTok ads from the package?' },
   { cat: 'Spend cut', name: 'Suspension request', kind: 'event', src: 'CRM', clears: 'A person acts on it or dismisses it', ex: 'Suspension of Paid Social requested for 2 months' },
@@ -864,6 +937,7 @@ const SIGTYPES = [
   { cat: 'Dissatisfaction', name: 'Formal complaint', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it; repeats count as one', ex: "The SEO report again doesn't show the keywords we agreed on." },
   { cat: 'Dissatisfaction', name: 'Open or overdue complaint', kind: 'condition', src: 'CRM', clears: 'Clears itself when the issue is resolved', ex: 'Issue ISS-1042 is past its target date' },
   { cat: 'Dissatisfaction', name: 'Questioning deliverables', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'Can you remind me what exactly we got for last month’s fee?' },
+  { cat: 'Dissatisfaction', name: 'Questioning performance', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'Why is our performance getting worse? It was better before we signed with you.' },
   { cat: 'Delivery delay', name: 'Late commencement', kind: 'condition', src: 'CRM', clears: 'Clears itself when actual commencement is recorded', ex: 'Commencement 12 days later than planned' },
   { cat: 'Delivery delay', name: 'Delayed milestone', kind: 'condition', src: 'CRM', clears: 'Clears itself when the milestone is complete', ex: 'Milestone "Q3 technical audit" 18 days late' },
   { cat: 'Delivery delay', name: 'Onboarding stalled', kind: 'condition', src: 'CRM', clears: 'Clears itself when mandatory onboarding items are complete', ex: 'Onboarding incomplete 21 days after contract start' },
@@ -871,7 +945,7 @@ const SIGTYPES = [
   { cat: 'Stakeholder change', name: 'New decision-maker', kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: 'Please loop in our new Head of Marketing.' },
   { cat: 'Stakeholder change', name: "Client's boss newly copied in", kind: 'event', src: 'Gmail', clears: 'A person acts on it or dismisses it', ex: "Client's director added to cc for the first time" },
   { cat: 'Engagement drop', name: 'Reply-time slowdown', rule: "Measured against this client's own usual pattern", kind: 'trend', src: 'Gmail', clears: 'Fades unless it keeps happening', ex: 'Replies slowing: 6h → 2.5 days over 4 weeks' },
-  { cat: 'Engagement drop', name: 'Tone cooling', rule: "Measured against this client's own usual pattern", kind: 'trend', src: 'Gmail', clears: 'Fades unless it keeps happening', ex: 'Shorter replies; greetings dropped' },
+  { cat: 'Engagement drop', name: 'Tone change', rule: "Measured against this client's own usual pattern", kind: 'trend', src: 'Gmail', clears: 'Fades unless it keeps happening', ex: 'Shorter replies; greetings dropped' },
   { cat: 'Engagement drop', name: 'Fewer contacts engaging', rule: "Measured against this client's own usual pattern", kind: 'trend', src: 'Gmail', clears: 'Fades unless it keeps happening', ex: 'Contacts replying dropped from 3 to 1' },
   { cat: 'Engagement drop', name: 'No reply to our email', kind: 'condition', src: 'Gmail', clears: 'Clears itself when the client replies', ex: 'No reply to our 08/10 report email after 7 days' },
   { cat: 'Engagement drop', name: 'No AM contact for an extended period', kind: 'condition', src: 'CRM', clears: 'Clears itself when a client interaction is logged', ex: 'No AM contact logged in 41 days' },
@@ -890,7 +964,7 @@ function viewCatalogue(o) {
       <div class="hint"><b>${list.length}</b> of <b>${SIGTYPES.length}</b> risk signal types shown, in <b>${SIG_CATS.length}</b> categories. Each category names what the risk is about, so a signal can be read at a glance.</div>
       <div class="row"><span class="eyebrow">Category</span><div class="chips">${chip('all')}${SIG_CATS.map(chip).join('')}</div></div>
       <div class="row"><span class="eyebrow">Source</span><div class="chips">${srcChip('all', 'All sources')}${srcChip('gmail', 'Gmail only')}</div></div>
-      ${anno('<b>Open decision:</b> the PRD refers to risks without defining them. This list is a starting point to confirm with the business, including which signals count as risks and how they are named.')}</div>
+      ${anno('<b>Open decision:</b> "risk" is not formally defined yet. This list is a starting point to confirm with the business, including which signals count as risks and how they are named.')}</div>
     ${tbl([['Category'], ['Signal'], ['Type and how it clears'], ['Source']], rows, state.src === 'gmail' ? 'No Gmail-sourced signal types match this filter.' : 'No signal types match this filter.', 'cat-tbl')}
     <div class="hint" style="padding:12px 24px 18px">Condition signals clear themselves when the underlying record changes. Event signals need a person to act or dismiss them. Trends are measured against each client's own usual pattern.</div>`;
 }
@@ -911,23 +985,42 @@ const hrsTxt = h => h < 48 ? `${fmtH(h)} hours` : `${fmtH(h)} hours (${(h / 24).
    emails = emails FROM the client (tone is read from these only).
    resp = emails WE sent that needed a reply, how many got none, and the median client reply time */
 const SENT_NOTES = {
-  '2026-10-13': { tone: 'negative', emails: 4, resp: { sent: 2, unanswered: 0, medHrs: 60.2 }, summary: 'A repeated reporting complaint and a notice-period question about Google Ads.',
+  '2026-10-13': { outbound: ['We sent the September report and the schedule for the homepage banner swap.'], overview: ['Client says the report still misses the agreed keyword groups and asked for it to be fixed.', 'Asked for the notice period ahead of the January renewal.', 'Confirmed the schedule for the homepage banner swap.'], tone: 'negative', emails: 4, resp: { sent: 2, unanswered: 0, medHrs: 60.2 }, summary: 'The client said the report does not show the agreed keywords and asked about the Google Ads notice period.',
     quotes: [{ quote: "The SEO report again doesn't show the keywords we agreed on.", from: 'Daphne Lee', date: '2026-10-13', note: 'Repeated complaint, first raised 29/09/2026', sig: 'SG-1202' },
              { quote: 'Ahead of our renewal in January, can you send the notice period for the Google Ads contract?', from: 'Daphne Lee', date: '2026-10-13', sig: 'SG-1201' }] },
-  '2026-10-03': { tone: 'positive', emails: 2, resp: { sent: 2, unanswered: 1, medHrs: 40.5 }, summary: 'Praise for the August report.',
+  '2026-10-03': { outbound: ['We sent the September report and asked the client to confirm the keyword groups.'], overview: ['Client praised the new dashboard layout in the August report.', 'Asked when the September report would be ready.'], tone: 'positive', emails: 2, resp: { sent: 2, unanswered: 1, medHrs: 40.5 }, summary: 'The client praised the August report.',
     quotes: [{ quote: 'Love the August report, the dashboard is much clearer.', from: 'Daphne Lee', date: '2026-10-03' }] },
-  '2026-09-29': { tone: 'negative', emails: 3, resp: { sent: 2, unanswered: 0, medHrs: 28.3 }, summary: 'The reporting complaint was first raised.',
+  '2026-09-29': { outbound: ['We sent a revised report timeline and replied about the Q4 review call.'], overview: ['First complaint that the report does not show the keywords agreed earlier.', 'Proposed two dates for the Q4 review call.'], tone: 'negative', emails: 3, resp: { sent: 2, unanswered: 0, medHrs: 28.3 }, summary: 'The client said the report does not show the keywords agreed earlier.',
     quotes: [{ quote: "The SEO report again doesn't show the keywords we agreed on.", from: 'Daphne Lee', date: '2026-09-29', sig: 'SG-1202' }] },
-  '2026-09-20': { tone: 'neutral', emails: 2, resp: { sent: 1, unanswered: 0, medHrs: 12.4 } },
-  '2026-04-08': { tone: 'positive', emails: 5, summary: 'Appreciation after the technical audit findings.',
+  '2026-09-20': { outbound: ['We sent the invite for the Q3 review call.'], overview: ['Agreed a date for the Q3 review call.', 'Approved the October ad budget.'], tone: 'neutral', emails: 2, resp: { sent: 1, unanswered: 0, medHrs: 12.4 } },
+  '2026-04-08': { overview: ['Client thanked us for the audit findings and asked about next steps.', 'Confirmed the blog topics for May.'], tone: 'positive', emails: 5, summary: 'The client thanked us for the technical audit findings.',
     quotes: [{ quote: 'The audit findings are really useful, thank you.', from: 'Daphne Lee', date: '2026-04-08' }] },
-  '2025-12-10': { tone: 'negative', emails: 4, summary: 'Concern about a late monthly report.',
+  '2025-12-10': { overview: ['Client said the report arrived after their review meeting and asked for a fixed delivery date.', 'Shared the team availability over the holidays.'], tone: 'negative', emails: 4, summary: 'The client said the November report arrived after their review meeting.',
     quotes: [{ quote: 'The November report arrived after our review meeting. Can we agree a fixed delivery date?', from: 'Daphne Lee', date: '2025-12-10' }] }
 };
 
+const SUMMARY_POOL = {
+  neutral: ['Report sent and received; no questions raised.', 'Arranged a time for the next catch-up call.', 'Client approved the next set of ad copy.', 'Confirmed the blog topics for next month.', 'Shared analytics access for a new team member.', 'Asked for a copy of the latest invoice; passed to Finance.'],
+  positive: ['Client said the latest report was clear and useful.', 'Client said the lead volume from the campaign was good.', 'Thanked the team for a quick turnaround.'],
+  negative: ['Client said the report content was not what they expected.', 'Client chased a delayed deliverable.', 'Client asked why results had slipped.']
+};
+const OUTBOUND_POOL = ['We sent the monthly report.', 'We sent the revised ad copy for approval.', 'We proposed a time for the next catch-up call.', 'We sent the updated content plan.', 'We sent instructions for analytics access.', 'We sent a copy of the latest invoice.'];
+function outboundOf(w) {
+  if (!w.sent) return [];
+  if (w.note && w.note.outbound) return w.note.outbound;
+  const h = hash('out' + w.start); const out = [];
+  for (let i = 0; i < Math.min(w.sent, 2); i++) out.push(OUTBOUND_POOL[(h + i * 3) % OUTBOUND_POOL.length]);
+  return out;
+}
+const replyLine = (sent, un) => !sent ? '' : un === 0 ? 'The client replied.' : un === sent ? (sent === 1 ? 'The client did not reply.' : 'The client did not reply to any of them.') : `The client did not reply to ${un} of ${sent}.`;
+function genOverview(w, tone, rt) {
+  const pool = SUMMARY_POOL[tone].slice(); const n = Math.min(w.emails, 2, pool.length); const out = [];
+  for (let k = 0; k < n; k++) out.push(pool.splice(Math.floor(rt() * pool.length), 1)[0]);
+  return out;
+}
 const SENTW = (() => {
   const o = orgById('abc'); const N = Math.ceil((TODAY - D(DET[o.id].since)) / (7 * 864e5));
-  const r = rng(hash('sent' + o.id)); const weeks = [];
+  const r = rng(hash('sent' + o.id)), rt = rng(hash('topics' + o.id)); const weeks = [];
   for (let i = 0; i < N; i++) {
     const end = new Date(TODAY.getTime() - (N - 1 - i) * 7 * 864e5), start = new Date(end.getTime() - 6 * 864e5);
     const w = { start: iso(start), end: iso(end), k: N - 1 - i, sent: 0, unanswered: 0, medHrs: null };
@@ -944,7 +1037,7 @@ const SENTW = (() => {
     emails = Math.max(emails, sent - unanswered);   // a reply is itself an email from the client
     Object.assign(w, { emails, sent, unanswered, medHrs, contacts: 1 + Math.floor(r() * 3) });
     w.state = emails >= MIN_EMAILS ? 'ok' : 'low';
-    if (w.state === 'ok') w.tone = tone;
+    if (w.state === 'ok') { w.tone = tone; w.overview = w.note && w.note.overview ? w.note.overview : genOverview(w, tone, rt); }
     weeks.push(w);
   }
   // two weeks where the client wrote nothing: one quiet week, and one where we emailed and heard nothing back
@@ -966,7 +1059,7 @@ const SENTM = (() => {
   const by = {}; SENTW.forEach(w => { const d = new Date(D(w.start).getTime() + 3 * 864e5); const key = d.getFullYear() + '-' + pad(d.getMonth() + 1); (by[key] = by[key] || { key, y: d.getFullYear(), m: d.getMonth(), weeks: [] }).weeks.push(w); });
   return Object.values(by).map(m => Object.assign(m, aggTone(m.weeks), { start: m.weeks[0].start, end: m.weeks[m.weeks.length - 1].end }));
 })();
-const WK_TEXT = { positive: n => `Appreciative tone across ${n} client email${n === 1 ? '' : 's'}.`, neutral: () => 'Routine messages with no clear tone either way.', negative: n => `Concern or frustration came through (${n} client email${n === 1 ? '' : 's'} read).` };
+const WK_TEXT = { positive: () => 'Positive language found in the client’s emails.', neutral: () => 'No positive or negative language found in the client’s emails.', negative: () => 'Negative language found in the client’s emails.' };
 
 const REPLY_SCALE = [[0, [254, 243, 199]], [.5, [251, 191, 36]], [1, [234, 88, 12]]];   // fastest pale cream -> amber -> slowest deep orange: darker means slower
 const scaleCss = t => { t = Math.max(0, Math.min(1, t)); const k = t <= .5 ? 0 : 1, [t0, c0] = REPLY_SCALE[k], [t1, c1] = REPLY_SCALE[k + 1], u = (t - t0) / (t1 - t0); return 'rgb(' + c0.map((v, n) => Math.round(v + (c1[n] - v) * u)).join(',') + ')'; };
@@ -978,16 +1071,25 @@ const respColor = (h, dom = respDomain()) => scaleCss(dom[1] === dom[0] ? 0 : (h
 function sentPanel(o, g, key) {
   const cell = g === 'week' ? SENTW.find(w => w.start === key) : SENTM.find(m => m.key === key);
   const label = g === 'week' ? `Week of ${fmtShort(cell.start)} – ${fmt(cell.end)}` : `${MON[cell.m]} ${cell.y}`;
-  const head = `<div class="row"><b>${label}</b>${cell.state === 'ok' ? toneTag(cell.tone) : ''}<span class="hint">${cell.emails} client email${cell.emails === 1 ? '' : 's'}</span></div>`;
+  const head = `<div class="row"><b>${label}</b>${cell.state === 'ok' ? toneTag(cell.tone) : ''}<span class="hint">${cell.emails} client email${cell.emails === 1 ? '' : 's'}${cell.sent ? ` · ${cell.sent} sent by us` : ''}</span></div>`;
   if (cell.state === 'before') return `${head}<p class="sent-sum">Gmail was not connected yet (connected ${fmt(GMAIL_FROM)}), so there is no email data for this period.</p>`;
-  if (cell.state === 'low') return `${head}<p class="sent-sum">The client sent no emails in this period, so there is no tone to read. A quiet inbox is not the same as a calm client.</p>`;
+  const oursSents = g === 'week' ? outboundOf(cell) : [...new Set(cell.weeks.flatMap(outboundOf))].slice(0, 3);
+  const ours = cell.sent ? oursSents.join(' ') + ' ' + replyLine(cell.sent, cell.unanswered) : '';
+  if (cell.state === 'low') return `${head}<div><div class="eyebrow">Summary</div><p class="sent-sum">${esc(cell.sent ? 'The client sent no emails in this period. ' + ours : 'No emails were sent or received in this period.')}</p></div>`;
   const notes = g === 'week' ? (cell.note ? [cell.note] : []) : cell.weeks.filter(w => w.note).map(w => w.note);
   const quotes = notes.flatMap(n => (n.quotes || []).map(q => Object.assign({ tone: n.tone }, q)));
   const link = x => x.sig ? ` · <button class="btn ghost sm" style="padding:0" data-open-sig="${x.sig}">View signal</button>` : '';
   const summary = notes.length ? notes.map(n => n.summary).filter(Boolean).join(' ') : WK_TEXT[cell.tone](cell.emails);
-  const byWeek = g === 'month' ? `<div class="hint">By week: ${cell.weeks.filter(w => w.state !== 'before').map(w => `${fmtShort(w.start)} ${w.state === 'ok' ? TONE_LABEL[w.tone].toLowerCase() : 'no emails'}`).join(' · ')}</div>` : '';
+  const byWeek = g === 'month' ? `<div class="hint">By week: ${cell.weeks.filter(w => w.state !== 'before').map(w => `${fmtShort(w.start)} ${w.state === 'ok' ? TONE_LABEL[w.tone] : 'No emails'}`).join(' · ')}</div>` : '';
   const ev = quotes.length ? `<div class=\"eyebrow\">Conversations behind this rating</div><ul class=\"evlist\">${quotes.map(x => `<li class="${x.tone}"><blockquote class="evq">“${esc(x.quote)}”</blockquote><div class="meta">${esc(x.from)} · Gmail · ${fmt(x.date)}${x.note ? ' · ' + esc(x.note) : ''}${link(x)}</div></li>`).join('')}</ul>` : (cell.tone === 'neutral' ? '' : '<div class="hint">No quotes were captured for this period.</div>');
-  return `${head}<p class="sent-sum">${esc(summary)}</p>${byWeek}${ev}`;
+  const overview = ((g === 'week' ? (cell.overview || []).join(' ') : monthOverview(cell.weeks)) + ' ' + ours).trim();
+  const summaryBlock = overview ? `<div><div class="eyebrow">Summary</div><p class="sent-sum">${esc(overview)}</p></div>` : '';
+  return `${head}${summaryBlock}${byWeek}<div class="toneblk"><div class="eyebrow">Tone</div><p class="sent-sum">${esc(summary)}</p>${ev}</div>`;
+}
+function monthOverview(ws) {   // the three points that came up most across the month's weeks
+  const m = new Map();
+  ws.forEach(w => (w.overview || []).forEach(t => m.set(t, (m.get(t) || 0) + w.emails)));
+  return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(e => e[0]).join(' ');
 }
 
 function sentimentCard(o) {
@@ -997,7 +1099,7 @@ function sentimentCard(o) {
   const dom = respDomain();
   const title = (c, row) => `${g === 'week' ? fmtShort(c.start) + ' – ' + fmtShort(c.end) : MON[c.m] + ' ' + c.y} · ` + (row === 'tone'
     ? `${c.state === 'ok' ? TONE_LABEL[c.tone] : c.state === 'low' ? 'No emails from the client' : 'Gmail not connected'} · ${c.emails} client email${c.emails === 1 ? '' : 's'}`
-    : (t => t === 'speed' ? `Median reply time ${fmtH(c.medHrs)} hours` : t === 'noreply' ? `No reply to ${c.unanswered} of our emails${c.medHrs !== null ? ' · the others were answered in a median ' + fmtH(c.medHrs) + ' hours' : ''}` : t === 'before' ? 'Gmail not connected' : 'No emails from us needing a reply')(replyState(c)));
+    : (t => t === 'speed' ? `Median reply time ${fmtH(c.medHrs)} hours` : t === 'noreply' ? `No reply to ${c.unanswered} of our emails${c.medHrs !== null ? ' · The others were answered in a median ' + fmtH(c.medHrs) + ' hours' : ''}` : t === 'before' ? 'Gmail not connected' : 'No responses')(replyState(c)));
   const btn = row => c => {
     let cls, style = '', txt = '';
     if (row === 'tone') { cls = toneOf(c); txt = g === 'month' ? MON[c.m] : ''; }
@@ -1008,17 +1110,16 @@ function sentimentCard(o) {
   const runLabel = r => g === 'week' ? MON[r.d.getMonth()] + (r.len >= 3 && (r.d.getMonth() === 0 || r === runs[0]) ? ' ' + r.d.getFullYear() : '') : String(r.d.getFullYear());
   const labels = `<div class="hmgrid hmlabels" style="grid-template-columns:repeat(${cells.length},minmax(0,1fr))">${runs.map(r => `<span class="hmmon" style="grid-column:${r.at + 1} / span ${r.len}">${runLabel(r)}</span>`).join('')}</div>`;
   const grid = row => `<div class="hmgrid" style="grid-template-columns:repeat(${cells.length},minmax(0,1fr))">${cells.map(btn(row)).join('')}</div>`;
-  const range = g === 'week' ? `Latest ${cells.length} weeks, ${fmt(cells[0].start)} to ${fmt(cells[cells.length - 1].end)}` : `Latest ${cells.length} months, ${MON[cells[0].m]} ${cells[0].y} to ${MON[cells[cells.length - 1].m]} ${cells[cells.length - 1].y}`;
   const chips = [['week', 'Weekly'], ['month', 'Monthly']].map(([v, l]) => `<button class="chip" data-gran="${v}" aria-pressed="${g === v}">${l}</button>`).join('');
-  return `<section class="section sent"><header><h2>Email sentiment</h2><div class="spacer"></div><div class="chips">${chips}</div></header>
+  return `<section class="section sent" id="sec-sentiment"><header><h2>Email sentiment</h2><div class="spacer"></div><div class="chips">${chips}</div></header>
     <div class="sent-body">
-      <div class="hm-wrap"><div class="hint">${range}</div>
-        <div class="hmtable"><span></span>${labels}<span class="hmrowlab">Tone<small>what the client wrote</small></span>${grid('tone')}<span class="hmrowlab">Response speed<small>median hours to answer us</small></span>${grid('reply')}</div>
-        <div class="hmlegend"><span class="hmlg"><b>Tone</b><span class="lgnote">from emails the client sent</span><span><i class="sw positive"></i>Positive</span><span><i class="sw neutral"></i>Neutral</span><span><i class="sw negative"></i>Negative</span><span><i class="sw low"></i>No emails</span></span>
-          <span class="hmlg"><b>Response speed</b><span class="lgnote">median hours to answer our emails</span>${cells.some(c => replyState(c) === 'speed') ? `<span class="gradlg"><span>${fmtH(dom[0])} h fastest</span><i class="gradbar" style="background:linear-gradient(90deg,${[0, .25, .5, .75, 1].map(scaleCss).join(',')})"></i><span>${fmtH(dom[1])} h slowest</span></span>` : ''}<span><i class="sw r-noreply"></i>No reply</span><span><i class="sw r-none"></i>No emails</span></span>
-          ${cells.some(c => c.state === 'before') ? '<span class="hmlg"><span><i class="sw before"></i>Gmail not connected (both rows)</span></span>' : ''}</div></div>
+      <div class="hm-wrap">
+        <div class="hmlegend"><span class="hmlg"><b>Tone</b><span><i class="sw positive"></i>Positive</span><span><i class="sw neutral"></i>Neutral</span><span><i class="sw negative"></i>Negative</span><span><i class="sw low"></i>No emails</span></span>
+          <span class="hmlg"><b>Response speed (hours)</b>${cells.some(c => replyState(c) === 'speed') ? `<span class="gradlg"><span>${fmtH(dom[0])}</span><i class="gradbar" style="background:linear-gradient(90deg,${[0, .25, .5, .75, 1].map(scaleCss).join(',')})"></i><span>${fmtH(dom[1])}</span></span>` : ''}<span><i class="sw r-noreply"></i>No reply</span><span><i class="sw r-none"></i>No responses</span></span>
+          ${cells.some(c => c.state === 'before') ? '<span class="hmlg"><span><i class="sw before"></i>Gmail not connected</span></span>' : ''}</div>
+        <div class="hm-scroll"><div class="hmtable" style="--n:${cells.length}"><span></span>${labels}<span class="hmrowlab">Tone</span>${grid('tone')}<span class="hmrowlab">Response speed (hours)</span>${grid('reply')}</div></div></div>
       <div class="sentpanel">${sentPanel(o, g, keyOf(sel))}</div>
-      <div class="hint">AI-assessed from email text and reply times, so calls and other channels are not included. It prompts a reassessment and never changes a health rating. Select a ${g === 'week' ? 'week' : 'month'} to see what is behind it.</div></div></section>`;
+      <div class="hint">Based on email text and reply times only. Calls and other channels are not included.</div></div></section>`;
 }
 
 function viewRisk(o) {
@@ -1027,23 +1128,25 @@ function viewRisk(o) {
   const hist = sigs.filter(s => !ACTIVE.includes(s.status)).sort(sortSig);
   const sigRow = s => `<button class="sig ${s.status === 'Dismissed' || s.status === 'Resolved' ? 'muted' : ''}" data-open-sig="${s.id}">
       <span class="sevcell">${catTag(s.cat)}</span>
-      <span class="what"><span class="t">${esc(s.title)}</span><br><span class="c">${esc(svcName(s.service))}${s.kind === 'condition' ? ' · ongoing' : ''}${s.reinforced > 1 ? ` · repeated ×${s.reinforced}` : ''}</span></span>
-      <span class="meta"><span class="src">${esc(s.source)} · ${s.kind === 'event' ? fmt(s.date) : 'since ' + fmt(s.date)}</span><span class="status ${s.status}">${s.status}</span></span>
+      <span class="what"><span class="t">${s.status === 'New' ? '<i class="newdot" aria-hidden="true"></i><span class="sr">New: </span>' : ''}${esc(s.title)}</span><span class="c">${esc(svcName(s.service))}${s.kind === 'condition' ? ' · Ongoing' : ''}${s.reinforced > 1 ? ` · Repeated ×${s.reinforced}` : ''}</span></span>
+      <span class="meta"><span class="src">${esc(s.source)} · ${s.kind === 'event' ? fmt(s.date) : 'Since ' + fmt(s.date)}</span>${s.status === 'New' ? '' : `<span class="stpill ${s.status}">${s.status}</span>`}</span><span class="chev" aria-hidden="true">›</span>
       ${s.quote ? `<span class="q">“${esc(s.quote)}”</span>` : s.detail ? `<span class="q" style="font-style:normal">${esc(s.detail)}</span>` : ''}
     </button>`;
   const ref = (key, title, inner) => `<details class="section ref" data-ref="${key}" ${state.open[key] ? 'open' : ''}><summary>${title}</summary>${inner}</details>`;
-  return `${healthCard(o)}${sentimentCard(o)}<section class="section" id="risk-signals">
+  const nav = `<nav class="secnav" aria-label="On this page"><button data-jump="sec-health" aria-current="true">Client health</button><button data-jump="sec-sentiment" aria-current="false">Email sentiment</button><button data-jump="risk-signals" aria-current="false">Risk signals<span class="ct">${active.length}</span></button></nav>`;
+  return `${nav}${healthCard(o)}${sentimentCard(o)}<section class="section" id="risk-signals">
       <header><h2>Risk signals</h2><span class="hint num">${active.length} active</span></header>
       ${active.length ? active.map(sigRow).join('') : '<div class="empty">No active risk signals.</div>'}
     </section>
     ${hist.length ? ref('hist', `Dismissed and resolved <span class="num hint">(${hist.length})</span>`, hist.map(sigRow).join('')) : ''}
-    ${ref('types', `Signal types <span class="hint">· ${SIGTYPES.length} · reference only</span>`, viewCatalogue(o))}`;
+    ${ref('types', `Signal types <span class="hint">· ${SIGTYPES.length} · Reference only</span>`, viewCatalogue(o))}`;
 }
 
 /* ---------- drawer ---------- */
+let drawerWasOpen = false, modalWasOpen = false;
 function renderDrawer() {
   const ov = document.getElementById('overlay');
-  if (!state.drawer) { ov.innerHTML = ''; return; }
+  if (!state.drawer) { ov.innerHTML = ''; if (drawerWasOpen) { drawerWasOpen = false; const t = state.restore && document.querySelector(state.restore); if (t) t.focus({ preventScroll: true }); } return; }
   const s = SIGNALS.find(x => x.id === state.drawer); const o = orgById(s.org);
   const sv = s.service && svcById(s.service);
   const closed = !ACTIVE.includes(s.status);
@@ -1055,10 +1158,8 @@ function renderDrawer() {
       <div class="row"><button class="btn primary sm" data-dismiss-confirm>Dismiss signal</button><button class="btn sm" data-mode="">Cancel</button></div>`;
   } else {
     const canDismiss = s.kind !== 'condition';
-    const acts = s.kind === 'trend'
-      ? [['checkin', 'Schedule a check-in call', 'Creates a task for the AM this week'], ['reassess', 'Reassess health', canEditHealth(o) ? 'Update the Client Health rating' : 'Ask the AM to reassess']]
-      : [['issue', 'Create Issue', 'Tracked complaint with an owner (PRD 8.3.5)'], ['reassess', 'Reassess health', canEditHealth(o) ? 'Update the Client Health rating' : 'Ask the AM to reassess'], ...(s.cat === 'Exit intent' ? [['cancel', 'Log cancellation request', 'Routes to COO for approval']] : [])];
-    foot = `<div class="eyebrow">Suggested actions</div><div class="actmenu">${acts.map(([k, t, d]) => `<button data-act="${k}"><b>${t}</b><span>${d}</span></button>`).join('')}</div>
+    const acts = [['issue', 'Create issue', 'Record it as an issue with an owner'], ['reassess', 'Reassess health', 'Update the client or service health rating']];
+    foot = `<div class="eyebrow">Actions</div><div class="actmenu">${acts.map(([k, t, d]) => `<button data-act="${k}"><b>${t}</b><span>${d}</span></button>`).join('')}</div>
       <div class="row">        ${canDismiss ? '<button class="btn" data-mode="dismiss">Dismiss…</button>' : '<button class="btn" disabled title="Condition signals clear themselves">Dismiss</button>'}</div>
 `;
   }
@@ -1072,14 +1173,15 @@ function renderDrawer() {
       <div><div class="eyebrow" style="margin-bottom:6px">Attributed to</div>
         <dl class="kv"><dt>Organisation</dt><dd>${esc(o.name)}</dd>
         <dt>Service</dt><dd>${esc(svcName(s.service))}</dd>
-        ${sv ? `<dt>Contract</dt><dd class="mono">${sv.contract} · ends ${fmt(sv.end)}</dd><dt>Annual value</dt><dd class="num">${money(sv.value)}</dd><dt>PE</dt><dd>${esc(sv.pe)}</dd>` : ''}
-        <dt>AM / rating</dt><dd>${esc(o.am)} · ${esc(o.rating)} (${fmt(o.ratedOn)})</dd>
+        ${sv ? `<dt>Contract</dt><dd class="mono">${sv.contract} · Ends ${fmt(sv.end)}</dd><dt>Annual value</dt><dd class="num">${money(sv.value)}</dd><dt>PE</dt><dd>${esc(sv.pe)}</dd>` : ''}
+        <dt>AM / rating</dt><dd>${esc(o.am)} · ${esc(hl(o.rating))} (${fmt(o.ratedOn)})</dd>
         ${s.linked ? `<dt>Linked to</dt><dd>${esc(s.linked)}</dd>` : ''}
         ${s.dismissReason ? `<dt>Dismissed because</dt><dd>${esc(s.dismissReason)}</dd>` : ''}</dl></div>
       <div><div class="eyebrow" style="margin-bottom:6px">Signal history</div><ul class="hist">${(s.history.length ? s.history : [{ d: s.date, t: 'Detected' }]).map(h => `<li><span class="when">${fmt(h.d)}</span><span>${esc(h.t)}</span></li>`).join('')}</ul></div>
     </div>
     <div class="foot">${foot}</div>
   </aside>`;
+  if (!drawerWasOpen) { drawerWasOpen = true; const x = ov.querySelector('.drawer .x'); if (x) x.focus({ preventScroll: true }); }
 }
 
 /* ---------- actions ---------- */
@@ -1092,7 +1194,7 @@ const who = () => ME;
 const log = (s, t) => s.history.push({ d: iso(TODAY), t });
 function openSig(id, orgId) {
   const s = SIGNALS.find(x => x.id === id); if (!s) return;
-  state.org = orgId || s.org; state.page = 'risk'; state.drawer = id; state.mode = null;
+  state.org = orgId || s.org; state.page = 'risk'; state.drawer = id; state.mode = null; state.restore = `[data-open-sig="${id}"]`;
   render();
 }
 function nextId(p) { return p + '-' + (1043 + Math.floor(Math.random() * 900)); }
@@ -1100,8 +1202,9 @@ function nextId(p) { return p + '-' + (1043 + Math.floor(Math.random() * 900)); 
 document.addEventListener('click', e => {
   const t = e.target.closest('button, [data-open-org], [data-close], [data-open-sig]'); if (!t) return;
   const d = t.dataset;
+  if (d.jump) { const el = document.getElementById(d.jump); if (el) el.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); setTimeout(updateSpy, 120); setTimeout(updateSpy, 700); return; }
   if (d.page) { state.page = d.page; state.scrollTo = d.scroll || null; render(); return; }
-  if (d.modal) { state.modal = { type: d.modal, sid: d.sid || null }; renderModal(); return; }
+  if (d.modal) { state.restoreModal = `[data-modal="${d.modal}"]${d.sid ? `[data-sid="${d.sid}"]` : ''}`; state.modal = { type: d.modal, sid: d.sid || null }; renderModal(); return; }
   if ('modalClose' in d) { state.modal = null; renderModal(); return; }
   if ('modalSave' in d) { saveModal(); return; }
   if (d.openSig) { openSig(d.openSig, d.org); return; }
@@ -1113,17 +1216,8 @@ document.addEventListener('click', e => {
   if ('mode' in d) { state.mode = d.mode || null; renderDrawer(); return; }
   const s = state.drawer && SIGNALS.find(x => x.id === state.drawer);
   if (d.act && s) {
-    const o = orgById(s.org);
-    if (d.act === 'reassess') {
-      if (canEditHealth(o)) { state.drawer = null; state.mode = null; state.modal = { type: 'health', sig: s.id }; render(); return; }
-      log(s, `${who()} asked ${o.am} to reassess Client Health`); s.status = 'Actioned'; s.linked = `Reassessment task for ${o.am}`;
-      toast(`Task sent to ${o.am} to reassess health`); state.mode = null; render(); return;
-    }
+    if (d.act === 'reassess') { state.drawer = null; state.mode = null; state.modal = { type: 'health', sig: s.id }; render(); return; }
     if (d.act === 'issue') { state.modal = { type: 'issue', sig: s.id }; renderModal(); return; }
-    const map = { issue: ['ISS', 'Issue', 'created'], cancel: ['CR', 'Cancellation request', 'logged; awaiting COO approval'], checkin: ['TSK', 'Check-in call task', 'created for this week'] };
-    const [p, n, v] = map[d.act]; const id = nextId(p);
-    s.status = 'Actioned'; s.linked = `${n} ${id}`; log(s, `${n} ${id} ${v} by ${who()}`);
-    toast(`${n} ${id} ${v}`); state.mode = null; render(); return;
   }
   if ('dismissConfirm' in d && s) {
     const r = document.getElementById('dismissReason').value.trim();
